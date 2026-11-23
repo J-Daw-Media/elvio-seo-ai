@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-11-23T15:07:24.1788481Z",
+  "baselineCommitSha": "ebed19ce1611fb190173da24ec46b99a9399e943",
+  "cloudBuildId": "f20c205c-4c54-4b5b-b647-3016ef38a2eb",
+  "productionImageDigest": "sha256:cdf3b27ae3d47387dbdf40169e54cf403cb3a6fa0cafb4f43e2e6301b6bd76c6",
+  "sourcePackageFingerprint": "c4d1b0ed73719d68be2e23750cbbde6854829982820847c85296b225a8f04a36",
+  "equivalence": "exact_for_deployed_source_package_after_documented_path_mapping",
+  "excludedFromBuildPackage": [
+    "docs/",
+    "reports/",
+    "scripts/",
+    "test/",
+    ".gitignore",
+    "README.md",
+    "deployment/"
+  ],
+  "files": [
+    {
+      "repositoryPath": "Dockerfile",
+      "buildPackagePath": "Dockerfile",
+      "size": 172,
+      "sha256": "91b0ad6460853a465095b496e1917da53a4b8608d9d9f8dc3e7eed2fe80393e5"
+    },
+    {
+      "repositoryPath": "package.json",
+      "buildPackagePath": "elvio-seo-ai/package.json",
+      "size": 178,
+      "sha256": "8c4a05a16befe1d815d0805676f9fb9298b16f5a836450ebce60213ae6efa10a"
+    },
+    {
+      "repositoryPath": "src/attribution.js",
+      "buildPackagePath": "elvio-seo-ai/src/attribution.js",
+      "size": 5792,
+      "sha256": "943f3c00a6f044ef94f501170e37dafa654c7b4bb279fc68e7daa4b5a6a319ec"
+    },
+    {
+      "repositoryPath": "src/attributionActivation.js",
+      "buildPackagePath": "elvio-seo-ai/src/attributionActivation.js",
+      "size": 10461,
+      "sha256": "a0a525c4eedcbcde50e699b4de3a005d68081ee60a711a8308cc959ba5f88cfa"
+    },
+    {
+      "repositoryPath": "src/cli.js",
+      "buildPackagePath": "elvio-seo-ai/src/cli.js",
+      "size": 375,
+      "sha256": "9b8abc79e78d76c9ba521c70fa93b4143a165e9997de7459641f126a38b6c9b3"
+    },
+    {
+      "repositoryPath": "src/cloudPersistence.js",
+      "buildPackagePath": "elvio-seo-ai/src/cloudPersistence.js",
+      "size": 2353,
+      "sha256": "21fdc7b05596458dc713231998cd9807d52d4324760c83dc70621ac4c213b8d3"
+    },
+    {
+      "repositoryPath": "src/collectors/adapters.js",
+      "buildPackagePath": "elvio-seo-ai/src/collectors/adapters.js",
+      "size": 1697,
+      "sha256": "f54a1592273cb9fa968b1ab5dd289085a0506592d37d08e36775af2765a4c210"
+    },
+    {
+      "repositoryPath": "src/collectors/ga4.js",
+      "buildPackagePath": "elvio-seo-ai/src/collectors/ga4.js",
+      "size": 2941,
+      "sha256": "67ce6ea2a8decf9fafec446482c8e3c87bb31a550b7d1780fd4e1b4d12f5cfdc"
+    },
+    {
+      "repositoryPath": "src/collectors/searchConsole.js",
+      "buildPackagePath": "elvio-seo-ai/src/collectors/searchConsole.js",
+      "size": 2488,
+      "sha256": "330c1e1d3ab67eb24129cfa20e7ddff9c5dd8aaf7c00204e3b3947f57d585d09"
+    },
+    {
+      "repositoryPath": "src/contentIntelligence.js",
+      "buildPackagePath": "elvio-seo-ai/src/contentIntelligence.js",
+      "size": 4515,
+      "sha256": "afa4f0e145ad41319b1f5c9588acf2eec9acd2cf967530d10adf46872b806902"
+    },
+    {
+      "repositoryPath": "src/contentProduction.js",
+      "buildPackagePath": "elvio-seo-ai/src/contentProduction.js",
+      "size": 4301,
+      "sha256": "c51a17a7545c6f9f02e715fd5d8579cd7ccea99276b60f86985347cd591c556e"
+    },
+    {
+      "repositoryPath": "src/creativeStudio.js",
+      "buildPackagePath": "elvio-seo-ai/src/creativeStudio.js",
+      "size": 1236,
+      "sha256": "147917936f8c29dbf7ff89222e4eaa3c985a7315cd9d84e97e8500f5a3d68fe7"
+    },
+    {
+      "repositoryPath": "src/derivedMemory.js",
+      "buildPackagePath": "elvio-seo-ai/src/derivedMemory.js",
+      "size": 4421,
+      "sha256": "66a0dcf17658aac984b09f4837eedefe34cba7030a6280edc98ed3421bff1476"
+    },
+    {
+      "repositoryPath": "src/engine.js",
+      "buildPackagePath": "elvio-seo-ai/src/engine.js",
+      "size": 909,
+      "sha256": "5d2bca2b698305568fa606bb26f4901ba9157f3a231f5d371747f79c606055e4"
+    },
+    {
+      "repositoryPath": "src/evidence.js",
+      "buildPackagePath": "elvio-seo-ai/src/evidence.js",
+      "size": 1349,
+      "sha256": "a6830054f1f575613f59fc72d6cdae9bb1a8a3adbdfdb9f25f60f836762b70af"
+    },
+    {
+      "repositoryPath": "src/googleAuth.js",
+      "buildPackagePath": "elvio-seo-ai/src/googleAuth.js",
+      "size": 1504,
+      "sha256": "be24692d91683734944d8b62cc1d11ea553f3404077b1f532b82a183c07a2fcd"
+    },
+    {
+      "repositoryPath": "src/identity.js",
+      "buildPackagePath": "elvio-seo-ai/src/identity.js",
+      "size": 675,
+      "sha256": "a6929e5cf941de6b8613609683b285464da822693bba300ac1d790280aa1942b"
+    },
+    {
+      "repositoryPath": "src/job.js",
+      "buildPackagePath": "elvio-seo-ai/src/job.js",
+      "size": 9265,
+      "sha256": "813b67a2ddb7d122fdb81543ac4e8181832220b012920df7d005534020e53639"
+    },
+    {
+      "repositoryPath": "src/memory.js",
+      "buildPackagePath": "elvio-seo-ai/src/memory.js",
+      "size": 2912,
+      "sha256": "54e6fd64f903cd0b2be8472e0324aec416ad79cfec4bc1d322c61aff9fa6ed9c"
+    },
+    {
+      "repositoryPath": "src/phase2.js",
+      "buildPackagePath": "elvio-seo-ai/src/phase2.js",
+      "size": 1156,
+      "sha256": "c6d438677eae17b5dd89d125a7245a08541f283be99b3e2027d9e5cb653b5b7d"
+    },
+    {
+      "repositoryPath": "src/pricingContext.js",
+      "buildPackagePath": "elvio-seo-ai/src/pricingContext.js",
+      "size": 1616,
+      "sha256": "c8f63207897ed58ba0f4265be538950c254c8083b9f465cd5da91322e8e5fb54"
+    },
+    {
+      "repositoryPath": "src/retry.js",
+      "buildPackagePath": "elvio-seo-ai/src/retry.js",
+      "size": 1032,
+      "sha256": "10f8f3471fc1840efec9c55742fe3036a04184f751656d02e46fc2f528132af3"
+    },
+    {
+      "repositoryPath": "src/review.js",
+      "buildPackagePath": "elvio-seo-ai/src/review.js",
+      "size": 1471,
+      "sha256": "ee0af441b69139b2673c3b45020b7be6f0138aa94bd3633c0881f4131355bc8a"
+    },
+    {
+      "repositoryPath": "src/safety.js",
+      "buildPackagePath": "elvio-seo-ai/src/safety.js",
+      "size": 1810,
+      "sha256": "753a92dd23211b4577200957b1347acac8d0f20aba03885313e9ddb8ec9906f7"
+    },
+    {
+      "repositoryPath": "src/scoring.js",
+      "buildPackagePath": "elvio-seo-ai/src/scoring.js",
+      "size": 1814,
+      "sha256": "d3d3889c4601260f0e3d0924990a304f1185c84c64096a1f2ddb1949168e4037"
+    },
+    {
+      "repositoryPath": "src/technicalAudit.js",
+      "buildPackagePath": "elvio-seo-ai/src/technicalAudit.js",
+      "size": 3934,
+      "sha256": "29ffadcfa8552892ddfcb9c243fd505056a356dee35d271132e57960a3415bdb"
+    },
+    {
+      "repositoryPath": "src/technicalRemediation.js",
+      "buildPackagePath": "elvio-seo-ai/src/technicalRemediation.js",
+      "size": 2386,
+      "sha256": "9384fb2e607823810a75f55ce13547dd20e94badd7fb68616bd2c2e52d8bcaee"
+    },
+    {
+      "repositoryPath": "src/wixContract.js",
+      "buildPackagePath": "elvio-seo-ai/src/wixContract.js",
+      "size": 622,
+      "sha256": "d0e7a49909bf60c0c21a69b6d719a773b71f9e7cf0d01400b59236bb47e6e602"
+    },
+    {
+      "repositoryPath": "src/wixDrafts.js",
+      "buildPackagePath": "elvio-seo-ai/src/wixDrafts.js",
+      "size": 1488,
+      "sha256": "caff5fc84603ad816f2d484b01c10e31bbfc5a8566f2920610ba95e9aeac50be"
+    },
+    {
+      "repositoryPath": "vendor/pricing.js",
+      "buildPackagePath": "src/pricing.js",
+      "size": 4323,
+      "sha256": "44f420a176e73a786f16c70e8419d930d7c32828d58804f6615ffb1402bc55d9"
+    }
+  ]
+}
