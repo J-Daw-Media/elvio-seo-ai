@@ -74,3 +74,45 @@ Stop before any Wix write when:
 - an earlier response remains uncertain;
 - the retrieval check cannot prove the draft is unpublished.
 
+## Gate 4B one-shot executor
+
+The isolated executor lives in `src/wixOneShotExecutor.js`. It is deliberately absent from `src/job.js`, `src/engine.js`, and `src/cli.js`, so the weekly and monthly SEO jobs cannot reach it. The durable ledger adapter in `src/wixExecutionLedger.js` uses a Firestore create-if-absent reservation and update-time compare-and-swap transitions. Temporary Wix credentials are loaded only at execution time through `src/wixCredentialSession.js` and must be revoked and independently verified before an execution can be reported as complete.
+
+The approved fingerprint and DJ Elvio Wix site ID are fixed in the executor. The caller cannot supply an arbitrary Wix URL. The only network routes accepted are exact draft creation and exact-ID draft retrieval. Every create body is rewritten with `publish: false`.
+
+### State and replay behavior
+
+| State | Meaning | Automatic create retry |
+|---|---|---|
+| `reserved` | Fingerprint atomically claimed before credentials or requests | No second executor may proceed |
+| `failed_before_request` | Validation, credential or site check failed before POST | No; owner review required |
+| `request_started` | POST may have reached Wix | Never |
+| `created` | Wix ID was persisted | Never; retrieve exact ID only |
+| `verified` | Exact draft retrieved and validated as unpublished | Never; replay returns the stored result |
+| `uncertain` | Outcome or verification is incomplete | Never; quarantined |
+
+### Failure and recovery matrix
+
+- **Failure before POST:** record `failed_before_request`; no Wix mutation is possible.
+- **Failure during POST or timeout:** record `uncertain`; do not issue another POST.
+- **Successful POST with lost response:** reservation remains `request_started` or becomes `uncertain`; inspect Wix manually and supply the exact Wix draft ID to the GET-only reconciliation path.
+- **Successful POST with failed ID persistence:** the durable reservation still blocks replay; reconcile by exact ID only after independent Wix inspection.
+- **Failed retrieval:** retain the known Wix ID, mark `uncertain`, and use GET-only reconciliation later.
+- **Conflicting draft identity or content:** mark `uncertain`; do not update or delete the Wix object automatically.
+- **Credential expiration:** if it occurs before POST, fail before request; if a request may have started, quarantine.
+- **Credential revocation failure:** report the security incident and do not declare Gate 4 complete, even if the draft was verified.
+
+Reconciliation never performs a POST. It accepts only the approved fingerprint, the fixed site ID, and an exact Wix-assigned draft ID, then performs one permitted GET and validates title, slug, SEO description, heading structure, image-free state, and unpublished status.
+
+### Live-test prerequisites
+
+1. Review and approve the new Gate 4B commit and unchanged article fingerprint.
+2. Merge PR #5 only after CI passes; PR #39 needs no Gate 4B code change.
+3. Create a temporary site-restricted Wix credential and a dedicated one-shot service identity.
+4. Grant that identity access only to the temporary Secret Manager version and the `seo_wix_draft_executions` ledger collection.
+5. Verify the recurring SEO job service account has no access to the Wix secret.
+6. Inspect Wix for an existing matching slug before execution.
+7. Run the isolated executor once; never invoke it from a schedule.
+8. Verify the returned draft by exact ID and execute the zero-POST replay check.
+9. Revoke the Wix key, disable the secret version, and independently verify both actions.
+
