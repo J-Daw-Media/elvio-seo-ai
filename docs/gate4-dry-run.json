@@ -1,0 +1,467 @@
+{
+  "mode": "gate4_development_dry_run",
+  "schemaVersion": "gate4-content-workflow-v1",
+  "pageReview": {
+    "id": "gate4-page-review:e23a7d7c62344892e50efb5343ae4738",
+    "kind": "existing_page_optimization",
+    "targetUrl": "https://www.djelvio.nl/wat-kost-een-dj-per-uur",
+    "searchIntent": "commercial_pricing_information",
+    "commercialObjective": "Bezoekers helpen de prijsopbouw te begrijpen en gekwalificeerde offerteaanvragen stimuleren.",
+    "currentContent": {
+      "title": "Wat kost een DJ per uur?",
+      "keySections": [
+        "Waarom het geen standaardprijs is",
+        "Wat krijg je?",
+        "Wat jij wél alvast kunt verwachten"
+      ],
+      "verifiedIssue": "De openbare pagina noemt 25 jaar ervaring; de goedgekeurde formulering is meer dan 20 jaar ervaring als DJ."
+    },
+    "proposedContent": {
+      "title": "Wat kost een DJ voor jouw feest?",
+      "introduction": "De prijs van een DJ hangt af van het type evenement, het aantal gasten, de speelduur, de locatie en de gewenste techniek. Daarom ontvangt iedere aanvraag een offerte die past bij het feest.",
+      "sections": [
+        {
+          "heading": "Welke keuzes bepalen de prijs?",
+          "body": "Beschrijf afzonderlijk de speelduur, het aantal gasten, de locatie en de keuze tussen DJ-only en een complete drive-in met geluid en licht."
+        },
+        {
+          "heading": "DJ-only of complete drive-in",
+          "body": "Leg het verschil uit zonder nieuwe pakketten, prijzen of beschikbaarheidsclaims te introduceren."
+        },
+        {
+          "heading": "Wat hebben we nodig voor een offerte?",
+          "body": "Vraag om datum, locatie, type evenement, aantal gasten en gewenste speelduur."
+        }
+      ],
+      "experienceCorrection": "Gebruik uitsluitend: meer dan 20 jaar ervaring als DJ."
+    },
+    "proposedMetadata": {
+      "title": "Wat kost een DJ voor jouw feest? | DJ Elvio",
+      "description": "Ontdek welke keuzes de prijs van een DJ bepalen en vraag een vrijblijvende offerte aan voor een passende DJ-service."
+    },
+    "internalLinks": [
+      "/bruiloftsfeest",
+      "/bedrijfsfeest",
+      "/contact"
+    ],
+    "cta": "Vraag vrijblijvend een offerte aan.",
+    "evidence": [
+      "public-page-snapshot:2026-11-23",
+      "verified-pricing-source:vendor/pricing.js",
+      "business-fact:more-than-20-years"
+    ],
+    "explanation": "De huidige pagina sluit aan op commerciële prijsintentie, maar kan duidelijker uitleggen welke factoren de offerte bepalen en gebruikt een niet-goedgekeurde ervaringsclaim.",
+    "factualVerificationRequirements": [
+      "Definitieve prijzen blijven buiten dit voorstel",
+      "Geen nieuwe pakketvoorwaarden",
+      "Controle van de bestaande Wix-paginavolgorde"
+    ],
+    "intendedWixAction": "manual_existing_page_review_only",
+    "contentFingerprint": "0cb910a17965dd9e1e69b4f8300240066b5acda41142b9b437e9dd83a9a8e2af",
+    "state": "owner_review",
+    "validation": {
+      "valid": true,
+      "errors": []
+    },
+    "publicationAuthorized": false,
+    "livePageWriteAllowed": false
+  },
+  "articleReview": {
+    "id": "gate4-article-review:bd5a181f5ab8460bb155b64d50840238",
+    "kind": "new_article",
+    "draft": {
+      "id": "seo-content-draft:13d9bc4a7db54107c8b2fc45004e9796",
+      "briefId": "seo-brief:c5e7bafc30455a89867b36bbf1f689ee",
+      "language": "nl-NL",
+      "destination": "wix_blog_draft_candidate",
+      "title": "Muziek voor een internationale bruiloft: zo verbind je alle gasten",
+      "slug": "muziek-voor-een-internationale-bruiloft-zo-verbind-je-alle-gasten",
+      "metaDescription": "Praktische tips voor muziek op een internationale bruiloft, met aandacht voor verschillende culturen, generaties en momenten van de dag.",
+      "h1": "Muziek voor een internationale bruiloft: zo verbind je alle gasten",
+      "h2s": [
+        "Begin met jullie gezamenlijke muzikale verhaal",
+        "Maak ruimte voor talen, culturen en generaties",
+        "Leg traditionele momenten vooraf vast",
+        "Werk met must-play en do-not-play keuzes",
+        "Stem de techniek en planning af met de locatie",
+        "Lees de dansvloer en blijf flexibel",
+        "DJ-only of een complete drive-in"
+      ],
+      "bodyHtml": "<h1>Muziek voor een internationale bruiloft: zo verbind je alle gasten</h1>\n<p>Op een internationale bruiloft komen vaak families, talen, leeftijden en muzikale voorkeuren samen. Een bruikbaar muziekplan probeert die verschillen niet weg te poetsen. Het geeft verschillende groepen herkenbare momenten en bouwt tegelijk naar een dansvloer waarop gasten samen kunnen vieren.</p>\n<h2>Begin met jullie gezamenlijke muzikale verhaal</h2>\n<p>Bespreek eerst welke muziek bij jullie als bruidspaar hoort. Denk aan nummers uit jullie jeugd, muziek die thuis werd gedraaid en liedjes die verbonden zijn aan familie, vrienden of belangrijke plaatsen. Benoem ook in welke talen bepaalde nummers belangrijk zijn. Zo ontstaat een persoonlijke basis zonder dat de avond een reeks losse verzoeknummers wordt.</p>\n<h2>Maak ruimte voor talen, culturen en generaties</h2>\n<p>Gasten hoeven niet ieder nummer te kennen om samen te kunnen dansen. Herkenbare ritmes, refreinen en zorgvuldig gekozen overgangen kunnen verschillende groepen bij elkaar brengen. Oudere familieleden reageren mogelijk op andere periodes dan vrienden die recente hits verwachten. De voorbereiding moet daarom duidelijk maken welke stijlen en talen vertegenwoordigd zijn, zonder te veronderstellen dat één keuze voor een hele cultuur spreekt.</p>\n<h2>Leg traditionele momenten vooraf vast</h2>\n<p>Een entree, openingsdans, familiedans of ander traditioneel moment kan een specifieke opname, versie of starttijd vereisen. Leg per moment vast welk nummer nodig is, wie het teken geeft en of de locatie microfoons of andere techniek verzorgt. Laat het bruidspaar de definitieve keuze bevestigen; de DJ hoeft geen betekenis of traditie in te vullen die niet expliciet is besproken.</p>\n<h2>Werk met must-play en do-not-play keuzes</h2>\n<p>Een korte must-playlijst geeft richting aan belangrijke momenten en nummers die echt bij jullie horen. Een do-not-playlijst voorkomt muziek die niet past of een ongewenste associatie heeft. Houd beide lijsten overzichtelijk. Voor het vrije feestgedeelte blijft dan voldoende ruimte om verzoeken te beoordelen en te reageren op wat op de dansvloer werkt.</p>\n<h2>Stem de techniek en planning af met de locatie</h2>\n<p>Controleer vooraf de beschikbare geluidsinstallatie, aansluitmogelijkheden, opbouwtijd, geluidslimieten en de positie van de DJ. Spreek met de locatie of ceremoniemeester af wie wijzigingen in het programma doorgeeft. Dat voorkomt onduidelijkheid wanneer een speech uitloopt, een traditioneel moment verschuift of meerdere talen in aankondigingen worden gebruikt.</p>\n<h2>Lees de dansvloer en blijf flexibel</h2>\n<p>Een planning geeft houvast, maar de reactie van de gasten bepaalt de volgorde tijdens het feest. Soms werkt een langer blok binnen één stijl; op een ander moment is een snellere overgang nodig om meerdere groepen mee te nemen. De DJ gebruikt de afgesproken voorkeuren als kader en past de route binnen dat kader aan de dansvloer aan.</p>\n<h2>DJ-only of een complete drive-in</h2>\n<p>Heeft de locatie passende techniek, dan kan een DJ-only invulling worden besproken. Is er nog geluid en licht nodig, dan kan een complete drive-in passend zijn. De benodigde opstelling hangt af van de ruimte, het aantal gasten, het programma en de afspraken met de locatie. De definitieve invulling en beschikbaarheid worden altijd per aanvraag bevestigd.</p>\n<p>Met meer dan 20 jaar ervaring als DJ bereidt DJ Elvio de muziek samen met het bruidspaar voor. Willen jullie bespreken welke muzikale en technische aanpak bij jullie bruiloft past? Vraag dan vrijblijvend een offerte aan via <a href=\"https://www.djelvio.nl/contact\">de contactpagina van DJ Elvio</a>.</p>",
+      "faq": [
+        {
+          "question": "Hoe combineer je verschillende muziekstijlen?",
+          "answerStatus": "requires_editorial_answer"
+        },
+        {
+          "question": "Welke informatie heeft de DJ vooraf nodig?",
+          "answerStatus": "requires_editorial_answer"
+        },
+        {
+          "question": "Wanneer past DJ-only of een complete drive-in?",
+          "answerStatus": "requires_editorial_answer"
+        }
+      ],
+      "internalLinks": [
+        "/bruiloftsfeest",
+        "/contact"
+      ],
+      "cta": "Vraag vrijblijvend een offerte aan via https://www.djelvio.nl/contact.",
+      "sourceEvidence": [
+        "public-service-page:/bruiloftsfeest",
+        "verified-business-fact:musical-versatility",
+        "verified-business-fact:more-than-20-years"
+      ],
+      "factsRequiringConfirmation": [
+        "service format",
+        "current package rules",
+        "authoritative pricing if prices are mentioned"
+      ],
+      "authoritativePricingEvidence": "vendor/pricing.js",
+      "approvalStatus": "pending_review",
+      "publishReady": false,
+      "fingerprint": "f5a9203c90fa2be3878636db78977f722c2f4426666a63af27e5eadb79495d53",
+      "validation": {
+        "valid": true,
+        "errors": []
+      }
+    },
+    "contentFingerprint": "baa01871c1ae417b7306686a2aa015c2783438da6805deadc177c435eb2e0bf7",
+    "duplicateAssessment": {
+      "matches": [],
+      "safe": true
+    },
+    "imagery": [],
+    "editorialReadiness": "ready_for_owner_review",
+    "seoEvidenceStatus": "pending_first_party_search_evidence",
+    "structure": {
+      "valid": true,
+      "errors": [],
+      "h1": "Muziek voor een internationale bruiloft: zo verbind je alle gasten",
+      "h2s": [
+        "Begin met jullie gezamenlijke muzikale verhaal",
+        "Maak ruimte voor talen, culturen en generaties",
+        "Leg traditionele momenten vooraf vast",
+        "Werk met must-play en do-not-play keuzes",
+        "Stem de techniek en planning af met de locatie",
+        "Lees de dansvloer en blijf flexibel",
+        "DJ-only of een complete drive-in"
+      ]
+    },
+    "searchIntent": "informational_with_commercial_path",
+    "cannibalizationAssessment": {
+      "status": "editorially_distinct_seo_evidence_pending",
+      "relatedPages": [
+        {
+          "url": "/bruiloftsfeest",
+          "overlap": "commercial wedding service"
+        },
+        {
+          "url": "/post/dagprogramma-bruiloft",
+          "overlap": "wedding planning information"
+        }
+      ],
+      "distinctAngle": "multilingual and multi-generational music planning",
+      "conclusion": "The article is editorially useful and distinct in angle, but current evidence does not prove enough separate query demand to authorize publication."
+    },
+    "factualVerification": {
+      "status": "passed_with_limits",
+      "verified": [
+        "more_than_20_years_as_dj",
+        "dj_only_or_complete_drive_in",
+        "personal_preparation"
+      ],
+      "prohibitedClaimsFound": [],
+      "limitations": [
+        "No cultural-specialist claim",
+        "No availability, price, testimonial or guarantee claim"
+      ]
+    },
+    "imageStatus": "image_pending",
+    "intendedWixAction": "create_unpublished_blog_draft_after_separate_approval",
+    "wixDryRun": {
+      "deterministicDraftId": "wix-blog-draft:bd5a181f5ab8460bb155b64d50840238",
+      "contentFingerprint": "baa01871c1ae417b7306686a2aa015c2783438da6805deadc177c435eb2e0bf7",
+      "siteId": "fe9762c6-cdbd-404c-ba42-c2b834b052e2",
+      "endpoint": "https://www.wixapis.com/blog/v3/draft-posts",
+      "payload": {
+        "draftPost": {
+          "title": "Muziek voor een internationale bruiloft: zo verbind je alle gasten",
+          "slug": "muziek-voor-een-internationale-bruiloft-zo-verbind-je-alle-gasten",
+          "excerpt": "Praktische tips voor muziek op een internationale bruiloft, met aandacht voor verschillende culturen, generaties en momenten van de dag.",
+          "richContent": {
+            "nodes": [
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Muziek voor een internationale bruiloft: zo verbind je alle gasten"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 1
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Op een internationale bruiloft komen vaak families, talen, leeftijden en muzikale voorkeuren samen. Een bruikbaar muziekplan probeert die verschillen niet weg te poetsen. Het geeft verschillende groepen herkenbare momenten en bouwt tegelijk naar een dansvloer waarop gasten samen kunnen vieren."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Begin met jullie gezamenlijke muzikale verhaal"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Bespreek eerst welke muziek bij jullie als bruidspaar hoort. Denk aan nummers uit jullie jeugd, muziek die thuis werd gedraaid en liedjes die verbonden zijn aan familie, vrienden of belangrijke plaatsen. Benoem ook in welke talen bepaalde nummers belangrijk zijn. Zo ontstaat een persoonlijke basis zonder dat de avond een reeks losse verzoeknummers wordt."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Maak ruimte voor talen, culturen en generaties"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Gasten hoeven niet ieder nummer te kennen om samen te kunnen dansen. Herkenbare ritmes, refreinen en zorgvuldig gekozen overgangen kunnen verschillende groepen bij elkaar brengen. Oudere familieleden reageren mogelijk op andere periodes dan vrienden die recente hits verwachten. De voorbereiding moet daarom duidelijk maken welke stijlen en talen vertegenwoordigd zijn, zonder te veronderstellen dat één keuze voor een hele cultuur spreekt."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Leg traditionele momenten vooraf vast"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Een entree, openingsdans, familiedans of ander traditioneel moment kan een specifieke opname, versie of starttijd vereisen. Leg per moment vast welk nummer nodig is, wie het teken geeft en of de locatie microfoons of andere techniek verzorgt. Laat het bruidspaar de definitieve keuze bevestigen; de DJ hoeft geen betekenis of traditie in te vullen die niet expliciet is besproken."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Werk met must-play en do-not-play keuzes"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Een korte must-playlijst geeft richting aan belangrijke momenten en nummers die echt bij jullie horen. Een do-not-playlijst voorkomt muziek die niet past of een ongewenste associatie heeft. Houd beide lijsten overzichtelijk. Voor het vrije feestgedeelte blijft dan voldoende ruimte om verzoeken te beoordelen en te reageren op wat op de dansvloer werkt."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Stem de techniek en planning af met de locatie"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Controleer vooraf de beschikbare geluidsinstallatie, aansluitmogelijkheden, opbouwtijd, geluidslimieten en de positie van de DJ. Spreek met de locatie of ceremoniemeester af wie wijzigingen in het programma doorgeeft. Dat voorkomt onduidelijkheid wanneer een speech uitloopt, een traditioneel moment verschuift of meerdere talen in aankondigingen worden gebruikt."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Lees de dansvloer en blijf flexibel"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Een planning geeft houvast, maar de reactie van de gasten bepaalt de volgorde tijdens het feest. Soms werkt een langer blok binnen één stijl; op een ander moment is een snellere overgang nodig om meerdere groepen mee te nemen. De DJ gebruikt de afgesproken voorkeuren als kader en past de route binnen dat kader aan de dansvloer aan."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "HEADING",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "DJ-only of een complete drive-in"
+                    }
+                  }
+                ],
+                "headingData": {
+                  "level": 2
+                }
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Heeft de locatie passende techniek, dan kan een DJ-only invulling worden besproken. Is er nog geluid en licht nodig, dan kan een complete drive-in passend zijn. De benodigde opstelling hangt af van de ruimte, het aantal gasten, het programma en de afspraken met de locatie. De definitieve invulling en beschikbaarheid worden altijd per aanvraag bevestigd."
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "PARAGRAPH",
+                "nodes": [
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "Met meer dan 20 jaar ervaring als DJ bereidt DJ Elvio de muziek samen met het bruidspaar voor. Willen jullie bespreken welke muzikale en technische aanpak bij jullie bruiloft past? Vraag dan vrijblijvend een offerte aan via "
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "de contactpagina van DJ Elvio",
+                      "decorations": [
+                        {
+                          "type": "LINK",
+                          "linkData": {
+                            "link": {
+                              "url": "https://www.djelvio.nl/contact",
+                              "target": "SELF"
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "type": "TEXT",
+                    "textData": {
+                      "text": "."
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "seoData": {
+            "tags": [
+              {
+                "type": "title",
+                "children": "Muziek voor een internationale bruiloft: zo verbind je alle gasten"
+              },
+              {
+                "type": "meta",
+                "props": {
+                  "name": "description",
+                  "content": "Praktische tips voor muziek op een internationale bruiloft, met aandacht voor verschillende culturen, generaties en momenten van de dag."
+                }
+              }
+            ]
+          }
+        },
+        "fieldsets": [
+          "RICH_CONTENT",
+          "URL"
+        ],
+        "publish": false
+      },
+      "mode": "dry_run_only",
+      "writesPerformed": 0,
+      "publishAllowed": false
+    },
+    "state": "owner_review",
+    "publicationAuthorized": false,
+    "wixDraftCreationAuthorized": false
+  },
+  "writesPerformed": 0,
+  "wixDraftsCreated": 0,
+  "livePagesModified": 0,
+  "publicationsPerformed": 0,
+  "crmWritesPerformed": 0,
+  "adsMutationsPerformed": 0,
+  "customerCommunicationsPerformed": 0
+}

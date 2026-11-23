@@ -85,6 +85,23 @@ function brief(record = {}) {
     suggestedCta: text(record.callToAction), claimsRequiringVerification: asArray(record.factualVerification).map(text),
     imageryStatus: text(record.imageryStatus || "not_assessed"), contentStatus: text(record.status || "draft_only"),
     publishReady: false, confidence: text(record.confidence), limitations: asArray(record.limitations).map(text),
+    gate4: {
+      workflow: text(record.workflow || (record.targetPage ? "existing_page_optimization" : "new_article_candidate")),
+      targetUrl: text(record.targetPage || record.targetUrl),
+      currentContent: record.currentContent || null,
+      proposedContent: record.proposedContent || null,
+      proposedMetadata: record.proposedMetadata || null,
+      validation: record.validation ? { valid: record.validation.valid === true, errors: asArray(record.validation.errors).map(text) } : null,
+      contentFingerprint: text(record.contentFingerprint || record.fingerprint),
+      wixDraftReadiness: text(record.wixDraftReadiness || "not_approved"),
+      intendedWixAction: text(record.intendedWixAction || "owner_review_only"),
+      editorialReadiness: text(record.editorialReadiness),
+      seoEvidenceStatus: text(record.seoEvidenceStatus),
+      cannibalizationAssessment: record.cannibalizationAssessment || null,
+      factualVerification: record.factualVerification || null,
+      imageStatus: text(record.imageStatus || record.imageryStatus || "image_pending"),
+      publicationAuthorized: false,
+    },
   };
 }
 
@@ -92,6 +109,8 @@ function review(record = {}) {
   return {
     id: text(record.id), briefId: text(record.briefId), reviewStatus: text(record.approvalStatus || "pending_review"),
     contentFingerprint: text(record.contentFingerprint), publicationAuthorized: false,
+    workflowState: text(record.state || record.workflowState || "owner_review"),
+    wixDraftId: text(record.wixDraftId), wixDraftCreationAuthorized: false,
   };
 }
 
@@ -129,6 +148,9 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
   };
   const searchConsole = sourceAvailability("searchConsole");
   const ga4 = sourceAvailability("ga4");
+  const autopilot = input.blogAutopilot || {};
+  const autopilotQueue = asArray(autopilot.candidates).map((item) => ({ id: text(item.id), title: text(item.title), state: text(item.state), eligible: item.eligible === true, reasons: asArray(item.reasons).map(text), plannedSlot: text(item.plannedSlot), evidenceFreshness: text(item.evidenceFreshness), imageStatus: text(item.imageStatus) }));
+  const publicationHistory = asArray(autopilot.publicationHistory).map((item) => ({ id: text(item.id), articleId: text(item.articleId), state: text(item.state), slotKey: text(item.slotKey), completedAt: iso(item.completedAt), publicUrl: text(item.publicUrl), contentFingerprint: text(item.contentFingerprint) }));
   return {
     schemaVersion: seoInterfaceSchemaVersion,
     generatedAt: new Date(options.now || Date.now()).toISOString(),
@@ -177,6 +199,28 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
       executions: executionRows,
       scheduledCadence: ["Monday 08:00 Europe/Amsterdam", "First Monday monthly review via guarded Monday 09:00 schedule"],
       collectionTriggeredByPageLoad: false,
+    },
+    blogAutopilot: {
+      policyId: text(autopilot.policyId || "elvio-blog-autopilot-v1"),
+      mode: text(autopilot.mode || "full_autopilot"),
+      activationState: text(autopilot.activationState || "development_only"),
+      monthlyTargetMaximum: Math.min(6, Math.max(0, number(autopilot.monthlyTargetMaximum || 6))),
+      publishedThisMonth: Math.max(0, number(autopilot.publishedThisMonth)),
+      remainingMonthlyCapacity: Math.max(0, 6 - Math.max(0, number(autopilot.publishedThisMonth)) - Math.max(0, number(autopilot.consumedUnverifiedAttempts))),
+      upcomingSlots: asArray(autopilot.upcomingSlots).slice(0, 6).map((item) => ({ id: text(item.id), localTime: iso(item.localTime), state: text(item.state || "planned"), articleId: text(item.articleId), attemptId: text(item.attemptId), quarantineReason: text(item.quarantineReason) })),
+      nextUpcomingSlot: (() => { const item = asArray(autopilot.upcomingSlots).find((slot) => ["planned", "unused"].includes(slot.state)); return item ? { id: text(item.id), localTime: iso(item.localTime), state: text(item.state) } : null; })(),
+      candidateQueue: page(autopilotQueue, { limit: 25, max: 50 }),
+      heldCount: autopilotQueue.filter((item) => ["held_for_review", "policy_rejected", "uncertain"].includes(item.state)).length,
+      validationFailureCount: Math.max(0, number(autopilot.validationFailureCount)),
+      skippedSlotCount: asArray(autopilot.upcomingSlots).filter((item) => item.state === "skipped").length,
+      failedAttemptCount: asArray(autopilot.upcomingSlots).filter((item) => ["failed_before_request", "uncertain", "publication_verification_failed"].includes(item.state)).length,
+      wixPublishingStatus: text(autopilot.wixPublishingStatus || "disabled"),
+      publicationHistory: page(publicationHistory, { limit: 25, max: 50 }),
+      latestExecutionStatus: text(autopilot.latestExecutionStatus || "not_activated"),
+      latestVerifiedPublication: [...publicationHistory].filter((item) => item.state === "published_verified").sort((a, b) => String(b.completedAt || "").localeCompare(String(a.completedAt || "")))[0] || null,
+      killSwitchActive: autopilot.killSwitchActive !== false,
+      performance: { searchEvidenceAvailable: autopilot.performance?.searchEvidenceAvailable === true, organicAttributionAvailable: autopilot.performance?.organicAttributionAvailable === true, limitation: text(autopilot.performance?.limitation || "Publication and commercial attribution remain unavailable until separately activated and verified.") },
+      readOnly: true,
     },
   };
 }

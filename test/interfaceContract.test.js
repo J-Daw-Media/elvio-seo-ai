@@ -39,6 +39,17 @@ test("contract never exposes source records or common PII fields", () => {
   assert.doesNotMatch(serialized, /private@example|0612345678|Private Person/);
 });
 
+test("Gate 4 review fields remain read only and cannot authorize Wix actions", () => {
+  const payload = buildSeoInterfaceContract({
+    contentBriefs: [{ id: "b1", targetPage: "/bedrijfsfeest", currentContent: { title: "Current" }, proposedContent: { title: "Proposed" }, validation: { valid: true }, contentFingerprint: "fp", wixDraftReadiness: "prepared" }],
+    reviews: [{ id: "r1", briefId: "b1", state: "owner_review", wixDraftId: "should-not-authorize" }],
+  });
+  assert.equal(payload.seoContentBriefs.items[0].gate4.publicationAuthorized, false);
+  assert.equal(payload.seoReviews.items[0].wixDraftCreationAuthorized, false);
+  assert.equal(payload.seoContentBriefs.items[0].gate4.currentContent.title, "Current");
+  assert.equal(payload.seoContentBriefs.items[0].gate4.proposedContent.title, "Proposed");
+});
+
 test("freshness labels evidence explicitly", () => {
   assert.equal(freshness(null), "unavailable");
   assert.equal(freshness("2026-11-23T08:00:00Z", new Date("2026-11-23T09:00:00Z")), "fresh");
@@ -77,6 +88,19 @@ test("collector availability preserves source errors, missing evidence and stale
   assert.equal(availability.ga4.reason, "quota_exhausted");
   assert.equal(availability.ga4.lastSuccessfulAt, "2026-11-01T08:00:00.000Z");
   assert.equal(inferAvailability([{ generatedAt: "2026-11-01T08:00:00.000Z", sources: [{ source: "ga4", status: "available" }] }], "2026-11-23T16:00:00.000Z").ga4.status, "stale");
+});
+
+test("autopilot monitoring is bounded, read only and inactive by default", () => {
+  const contract = buildSeoInterfaceContract({ blogAutopilot: { candidates: Array.from({ length: 60 }, (_, index) => ({ id: `c${index}`, title: `Candidate ${index}`, state: index ? "policy_rejected" : "eligible_for_autopilot", eligible: index === 0 })), publicationHistory: Array.from({ length: 60 }, (_, index) => ({ id: `p${index}`, articleId: `a${index}`, state: "published_verified" })) } });
+  assert.equal(contract.blogAutopilot.policyId, "elvio-blog-autopilot-v1");
+  assert.equal(contract.blogAutopilot.activationState, "development_only");
+  assert.equal(contract.blogAutopilot.monthlyTargetMaximum, 6);
+  assert.equal(contract.blogAutopilot.remainingMonthlyCapacity, 6);
+  assert.equal(contract.blogAutopilot.wixPublishingStatus, "disabled");
+  assert.equal(contract.blogAutopilot.killSwitchActive, true);
+  assert.equal(contract.blogAutopilot.readOnly, true);
+  assert.equal(contract.blogAutopilot.candidateQueue.items.length, 25);
+  assert.equal(contract.blogAutopilot.publicationHistory.items.length, 25);
 });
 
 
