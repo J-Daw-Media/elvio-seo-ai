@@ -85,6 +85,18 @@ function brief(record = {}) {
     suggestedCta: text(record.callToAction), claimsRequiringVerification: asArray(record.factualVerification).map(text),
     imageryStatus: text(record.imageryStatus || "not_assessed"), contentStatus: text(record.status || "draft_only"),
     publishReady: false, confidence: text(record.confidence), limitations: asArray(record.limitations).map(text),
+    gate4: {
+      workflow: text(record.workflow || (record.targetPage ? "existing_page_optimization" : "new_article_candidate")),
+      targetUrl: text(record.targetPage || record.targetUrl),
+      currentContent: record.currentContent || null,
+      proposedContent: record.proposedContent || null,
+      proposedMetadata: record.proposedMetadata || null,
+      validation: record.validation ? { valid: record.validation.valid === true, errors: asArray(record.validation.errors).map(text) } : null,
+      contentFingerprint: text(record.contentFingerprint || record.fingerprint),
+      wixDraftReadiness: text(record.wixDraftReadiness || "not_approved"),
+      intendedWixAction: text(record.intendedWixAction || "owner_review_only"),
+      publicationAuthorized: false,
+    },
   };
 }
 
@@ -92,6 +104,8 @@ function review(record = {}) {
   return {
     id: text(record.id), briefId: text(record.briefId), reviewStatus: text(record.approvalStatus || "pending_review"),
     contentFingerprint: text(record.contentFingerprint), publicationAuthorized: false,
+    workflowState: text(record.state || record.workflowState || "owner_review"),
+    wixDraftId: text(record.wixDraftId), wixDraftCreationAuthorized: false,
   };
 }
 

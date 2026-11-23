@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check": "node src/cli.js --dry-run"
+    "check": "node src/cli.js --dry-run",
+    "gate4:dry-run": "node scripts/gate4-dry-run.js"
   }
 }

@@ -39,6 +39,17 @@ test("contract never exposes source records or common PII fields", () => {
   assert.doesNotMatch(serialized, /private@example|0612345678|Private Person/);
 });
 
+test("Gate 4 review fields remain read only and cannot authorize Wix actions", () => {
+  const payload = buildSeoInterfaceContract({
+    contentBriefs: [{ id: "b1", targetPage: "/bedrijfsfeest", currentContent: { title: "Current" }, proposedContent: { title: "Proposed" }, validation: { valid: true }, contentFingerprint: "fp", wixDraftReadiness: "prepared" }],
+    reviews: [{ id: "r1", briefId: "b1", state: "owner_review", wixDraftId: "should-not-authorize" }],
+  });
+  assert.equal(payload.seoContentBriefs.items[0].gate4.publicationAuthorized, false);
+  assert.equal(payload.seoReviews.items[0].wixDraftCreationAuthorized, false);
+  assert.equal(payload.seoContentBriefs.items[0].gate4.currentContent.title, "Current");
+  assert.equal(payload.seoContentBriefs.items[0].gate4.proposedContent.title, "Proposed");
+});
+
 test("freshness labels evidence explicitly", () => {
   assert.equal(freshness(null), "unavailable");
   assert.equal(freshness("2026-11-23T08:00:00Z", new Date("2026-11-23T09:00:00Z")), "fresh");
