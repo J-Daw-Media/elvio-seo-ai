@@ -16,7 +16,7 @@ export class SecretManagerWixCredentialSession {
     return this.lastSession;
   }
 
-  async revoke(session) { await this.revokeCredential({ siteId: session.siteId, secretVersion: session.secretVersion }); }
-  async isRevoked(session) { return Boolean(await this.verifyRevoked({ siteId: session.siteId, secretVersion: session.secretVersion })); }
+  async revoke(session) { await this.revokeCredential({ siteId: session.siteId, secretVersion: session.secretVersion, credential: session.credential }); }
+  async isRevoked(session) { return Boolean(await this.verifyRevoked({ siteId: session.siteId, secretVersion: session.secretVersion, credential: session.credential })); }
 }
 

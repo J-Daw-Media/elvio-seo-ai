@@ -31,6 +31,8 @@ Required server-only variables:
 
 The operations module must export `revokeCredential()` and `verifyRevoked()`. It is an operational adapter for the temporary Wix key lifecycle, not part of recurring SEO jobs. Activation is prohibited until that adapter can independently revoke the Wix key and prove the revoked key no longer authenticates. Disabling only the Secret Manager version is insufficient.
 
+For an isolated operator-run invocation, `GOOGLE_OAUTH_ACCESS_TOKEN` may contain a short-lived token issued for the dedicated execution identity. When absent, the entrypoint uses the Cloud Run metadata service. The Wix credential is passed to the revocation adapter only in memory so it can independently prove that Wix rejects the deleted key; it must never print or persist that value.
+
 ## Synthetic rehearsal
 
 Run `npm run gate4g:rehearse`. It uses only in-memory ledgers, a synthetic credential and a simulated Wix transport. It performs one simulated POST, exact-ID GET verification, credential revocation verification and a zero-request replay.

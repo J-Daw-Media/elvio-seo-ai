@@ -218,6 +218,13 @@ test("Secret Manager session retrieves at runtime and requires verified revocati
   assert.doesNotMatch(JSON.stringify({ calls, session: { siteId: session.siteId, secretVersion: session.secretVersion } }), /synthetic-wix-key/);
 });
 
+test("Secret Manager revocation callbacks receive the live credential without logging it", async () => {
+  const seen = [];
+  const session = new SecretManagerWixCredentialSession({ projectId: "p", secretId: "s", siteId: approvedGate4Candidate.siteId, accessTokenProvider: async () => "google-token", fetchImpl: async () => response(200, { payload: { data: Buffer.from("wix-key").toString("base64") } }), revokeCredential: async (value) => seen.push(["revoke", value.credential]), verifyRevoked: async (value) => { seen.push(["verify", value.credential]); return true; } });
+  const acquired = await session.acquire(); await session.revoke(acquired); assert.equal(await session.isRevoked(acquired), true);
+  assert.deepEqual(seen, [["revoke", "wix-key"], ["verify", "wix-key"]]);
+});
+
 test("Firestore ledger reserves with create-if-absent and transitions with update-time CAS", async () => {
   const fingerprint = approvedGate4Candidate.fingerprint; const calls = [];
   let stored = null; let updateTime = "2026-11-23T12:00:00.000Z";

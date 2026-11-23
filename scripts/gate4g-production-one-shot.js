@@ -14,6 +14,7 @@ const source = JSON.parse(fs.readFileSync(new URL("../docs/gate4-dry-run.json", 
 const review = transitionContentState(source.articleReview, "approved_for_draft_creation", { approvedFingerprint: source.articleReview.contentFingerprint, at: new Date().toISOString() });
 const preparedInput = { review, wixDryRun: source.articleReview.wixDryRun, approvedFingerprint: approvedGate4Candidate.fingerprint, siteId: approvedGate4Candidate.siteId };
 const tokenProvider = async () => {
+  if (process.env.GOOGLE_OAUTH_ACCESS_TOKEN) return process.env.GOOGLE_OAUTH_ACCESS_TOKEN;
   const response = await fetch("http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token", { headers: { "Metadata-Flavor": "Google" } });
   if (!response.ok) throw new Error(`GATE4G_METADATA_AUTH_HTTP_${response.status}`);
   return (await response.json()).access_token;
