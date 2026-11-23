@@ -1,0 +1,19 @@
+{
+  "status": "prepared_not_created",
+  "timeZone": "Europe/Amsterdam",
+  "jobs": [
+    {
+      "name": "elvio-seo-ai-weekly",
+      "cron": "0 8 * * 1",
+      "mode": "dry_run_read_only_collection"
+    },
+    {
+      "name": "elvio-seo-ai-monthly-review",
+      "cron": "0 9 1-7 * 1",
+      "mode": "dry_run_read_only_review",
+      "note": "Application must additionally enforce first-Monday semantics."
+    }
+  ],
+  "automaticArticleGeneration": false,
+  "automaticPublishing": false
+}

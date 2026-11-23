@@ -1,0 +1,33 @@
+# Dependencies and generated build output
+node_modules/
+coverage/
+dist/
+build/
+.cache/
+*.log
+
+# Local execution evidence and generated output
+output/
+tmp/
+*.local
+
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credential*.json
+*credentials*.json
+*service-account*.json
+*service_account*.json
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
