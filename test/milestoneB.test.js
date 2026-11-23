@@ -8,6 +8,8 @@ import { publishVerifiedDraft } from "../src/blogPublicationTransport.js";
 import { prepareAutopilotCandidate, productionActivationState } from "../src/blogAutopilotRuntime.js";
 import { verifyPublicArticle } from "../src/publicPageVerification.js";
 import { runMilestoneBCreativeRehearsal } from "../src/milestoneBCreativeRehearsal.js";
+import { loadBundledCreativeStudioRegistry, verifyCreativeStudioProductionAccess } from "../src/creativeStudioProduction.js";
+import { buildFirstPublicationPackage } from "../src/firstPublicationPackage.js";
 
 const goodArticle = { title: "Titel", h1: "Titel", seoTitle: "SEO titel", seoDescription: "Beschrijving", excerpt: "Samenvatting", sections: [{}, {}, {}], ctaUrl: "https://www.djelvio.nl/contact", evidenceRefs: ["e1"], unsupportedClaims: [] };
 
@@ -62,6 +64,35 @@ test("owner-approved Pexels detail library is valid, unique and topic-selectable
   assert.equal(selectApprovedAsset(records, { topicTags: ["dj-equipment", "mixer"] }).asset.categories.includes("equipment"), true);
 });
 
+test("production Creative Studio access verifies bounded object metadata and expected checksums", async () => {
+  const records = loadBundledCreativeStudioRegistry();
+  const seen = [];
+  const result = await verifyCreativeStudioProductionAccess({
+    records,
+    bucket: "synthetic-bucket",
+    accessToken: "synthetic-token",
+    fetchImpl: async (url, options) => {
+      seen.push({ url, auth: options.headers.Authorization });
+      const fileName = decodeURIComponent(url).split("/").at(-1);
+      const record = records.find((item) => item.fileName === fileName);
+      return { ok: true, json: async () => ({ generation: "1", metadata: { sha256: record.checksum } }) };
+    },
+  });
+  assert.equal(result.status, "available");
+  assert.equal(result.verifiedAssets, 12);
+  assert.equal(result.writesPerformed, 0);
+  assert.equal(seen.length, 12);
+  assert.ok(seen.every((item) => item.auth === "Bearer synthetic-token"));
+});
+
+test("production Creative Studio access fails closed on inaccessible or mismatched objects", async () => {
+  const records = loadBundledCreativeStudioRegistry().slice(0, 2);
+  let call = 0;
+  const result = await verifyCreativeStudioProductionAccess({ records, bucket: "synthetic", accessToken: "token", fetchImpl: async () => (++call === 1 ? { ok: false, status: 403 } : { ok: true, json: async () => ({ metadata: { sha256: "wrong" } }) }) });
+  assert.equal(result.status, "incomplete");
+  assert.equal(result.verifiedAssets, 0);
+});
+
 test("Wix media uses only generated signed upload and verifies READY", async () => {
   const calls = [];
   const fetchImpl = async (url, options) => { calls.push([url, options.method]); return url.includes("generate-upload-url") ? { ok: true, json: async () => ({ uploadUrl: "https://upload.example/signed" }) } : { ok: true, json: async () => ({ file: { id: "file1", state: "READY", mimeType: "image/jpeg" } }) }; };
@@ -94,4 +125,19 @@ test("Milestone B rehearsal covers all fifteen stages without external activity"
   assert.equal(result.passed, true);
   assert.equal(result.externalWrites, 0);
   assert.equal(result.externalRequests, 0);
+});
+
+test("first publication package binds exploratory evidence, exact article, image, Wix destination and fingerprints", () => {
+  const prepared = buildFirstPublicationPackage();
+  assert.equal(prepared.selection.evidenceDecision.sufficient, true);
+  assert.equal(prepared.selection.classification, "evidence_backed_exploratory_opportunity");
+  assert.equal(prepared.image.assetId, "pexels-34307990-v1");
+  assert.equal(prepared.image.illustrativeStock, true);
+  assert.equal(prepared.image.actualDjElvioEvent, false);
+  assert.match(prepared.article.contentFingerprint, /^[a-f0-9]{64}$/);
+  assert.match(prepared.publicationFingerprint, /^[a-f0-9]{64}$/);
+  assert.equal(prepared.wix.siteId, "fe9762c6-cdbd-404c-ba42-c2b834b052e2");
+  assert.equal(prepared.wix.existingHistoricalDraftId, "cf13a806-22ee-43c2-bb29-c362132bf325");
+  assert.equal(prepared.wix.duplicateDraftCreationAllowed, false);
+  assert.equal(prepared.wix.publicationAuthorized, false);
 });

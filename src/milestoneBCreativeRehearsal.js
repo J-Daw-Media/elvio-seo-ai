@@ -1,5 +1,8 @@
 import { selectApprovedAsset, validateAssetRegistry } from "./creativeStudioRegistry.js";
 import { productionActivationState } from "./blogAutopilotRuntime.js";
+import { loadBundledCreativeStudioRegistry } from "./creativeStudioProduction.js";
+import { buildFirstPublicationPackage } from "./firstPublicationPackage.js";
+import { selectAutopilotTopics } from "./blogTopicSelection.js";
 
 export function runMilestoneBCreativeRehearsal() {
   const syntheticAsset = {
@@ -24,17 +27,34 @@ export function runMilestoneBCreativeRehearsal() {
   const registry = validateAssetRegistry([syntheticAsset]);
   const selection = selectApprovedAsset([syntheticAsset], { topicTags: ["wedding", "international-wedding"] });
   const disabledState = productionActivationState({ BLOG_AUTOPILOT_MODE: "disabled", BLOG_AUTOPILOT_KILL_SWITCH: "true" });
+  const productionRegistry = validateAssetRegistry(loadBundledCreativeStudioRegistry());
+  const publicationPackage = buildFirstPublicationPackage();
+  const selectedTopics = selectAutopilotTopics({
+    now: new Date("2026-11-23T10:00:00Z"),
+    opportunities: [{
+      id: publicationPackage.selection.selectedOpportunity.id,
+      topic: publicationPackage.article.title,
+      opportunityScore: 75,
+      evidenceCategory: publicationPackage.selection.classification,
+      evidenceStrength: "exploratory",
+      evidenceFactors: publicationPackage.selection.selectedOpportunity.evidenceFactors,
+      searchIntent: "informational_commercial",
+      commercialObjective: "qualified_inquiries",
+      cannibalizationRisk: "low",
+      evaluatedAt: "2026-11-23T09:00:00Z",
+    }],
+  });
 
   const steps = [
-    ["seo_opportunity_selection", true],
+    ["seo_opportunity_selection", selectedTopics.selected.length === 1 && selectedTopics.exploratorySelected === 1],
     ["dutch_article_generation", true],
     ["content_validation", true],
-    ["asset_selection", selection.available],
-    ["rights_and_provenance_verification", registry.valid && registry.usable === 1],
-    ["creative_studio_registry_lookup", registry.total === 1],
-    ["wix_image_preparation", true],
+    ["asset_selection", selection.available && publicationPackage.image.assetId === "pexels-34307990-v1"],
+    ["rights_and_provenance_verification", registry.valid && registry.usable === 1 && productionRegistry.valid],
+    ["creative_studio_registry_lookup", productionRegistry.total === 12 && productionRegistry.usable === 12],
+    ["wix_image_preparation", publicationPackage.wix.imageUploadAuthorized === false],
     ["wix_draft_create_retrieve_simulation", true],
-    ["publication_eligibility", true],
+    ["publication_eligibility", publicationPackage.finalEligibility === "owner_approval_required_for_controlled_wix_trial"],
     ["publication_transport_simulation", true],
     ["public_page_verification_simulation", true],
     ["duplicate_protection", registry.duplicateDriveIds.length === 0 && registry.duplicateChecksums.length === 0],

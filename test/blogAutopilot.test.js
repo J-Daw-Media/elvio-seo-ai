@@ -24,9 +24,44 @@ function candidate(overrides = {}) {
 test("autopilot policy is versioned, capped at six and inactive by default", () => {
   assert.equal(blogAutopilotPolicyV1.id, "elvio-blog-autopilot-v1");
   assert.equal(blogAutopilotPolicyV1.monthlyPublicationLimit, 6);
+  assert.equal(blogAutopilotPolicyV1.exploratoryPublicationLimit, 2);
   assert.equal(blogAutopilotPolicyV1.slots.length, 6);
   assert.equal(blogAutopilotPolicyV1.activationState, "development_only");
   assert.equal(publicationExecutorContract.productionRequestEnabled, false);
+});
+
+test("exploratory opportunities require a traceable five-part evidence bundle and are capped at two", () => {
+  const exploratory = (id, opportunityScore) => ({
+    id, topic: `Exploratory ${id}`, opportunityScore,
+    evidenceCategory: "evidence_backed_exploratory_opportunity",
+    searchIntent: "informational_commercial", commercialObjective: "qualified_inquiries",
+    cannibalizationRisk: "low", evaluatedAt: "2026-11-20T10:00:00Z",
+    evidenceFactors: [
+      { type: "related_first_party_search", ref: `gsc:${id}` },
+      { type: "commercial_search_intent", ref: `intent:${id}` },
+      { type: "site_content_gap", ref: `gap:${id}` },
+      { type: "distinct_editorial_value", ref: `editorial:${id}` },
+      { type: "verified_service_connection", ref: `service:${id}` },
+    ],
+  });
+  const result = selectAutopilotTopics({ now: new Date("2026-11-23T10:00:00Z"), opportunities: [exploratory("a", 90), exploratory("b", 80), exploratory("c", 70)] });
+  assert.deepEqual(result.selected.map((item) => item.id), ["a", "b"]);
+  assert.equal(result.exploratorySelected, 2);
+  assert.deepEqual(result.rejected.find((item) => item.id === "c").reasons, ["exploratory_monthly_limit_reached"]);
+});
+
+test("exploratory eligibility fails closed when evidence is incomplete or monthly cap is consumed", () => {
+  const fullEvidence = [
+    { type: "related_first_party_search", ref: "gsc:wedding-cluster" },
+    { type: "commercial_search_intent", ref: "intent:wedding-dj" },
+    { type: "site_content_gap", ref: "gap:international-music" },
+    { type: "distinct_editorial_value", ref: "editorial:multilingual-planning" },
+    { type: "verified_service_connection", ref: "service:wedding-dj" },
+  ];
+  const base = candidate({ evidenceCategory: "evidence_backed_exploratory_opportunity", evidenceFactors: fullEvidence, opportunityEvidenceStrength: "exploratory" });
+  assert.equal(evaluateAutopilotEligibility(base, { now: new Date("2026-11-23T10:00:00Z"), killSwitch: false }).eligible, true);
+  assert.equal(evaluateAutopilotEligibility({ ...base, evidenceFactors: fullEvidence.slice(0, 4) }, { now: new Date("2026-11-23T10:00:00Z"), killSwitch: false }).eligible, false);
+  assert.equal(evaluateAutopilotEligibility(base, { now: new Date("2026-11-23T10:00:00Z"), killSwitch: false, exploratoryAttemptsThisMonth: 2 }).reasons.includes("exploratory_monthly_limit_reached"), true);
 });
 
 test("topic selection ranks supported opportunities and never fabricates quota fillers", () => {
