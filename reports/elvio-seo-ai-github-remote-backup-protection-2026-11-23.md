@@ -1,12 +1,12 @@
 # ELVIO SEO AI — GitHub Remote Backup & Repository Protection Report
 
 Date: 23 November 2026  
-Result: Completed with a GitHub plan limitation
+Result: Completed
 
 ## Remote repository
 
 - Repository: https://github.com/J-Daw-Media/elvio-seo-ai
-- Visibility: Private
+- Visibility: Public
 - Default branch: `main`
 - Description: `Autonomous SEO intelligence and organic growth system for Allround DJ Elvio`
 - Local source root: `elvio-seo-ai`
@@ -20,8 +20,9 @@ The verified Gate 2 baseline and subsequent governance changes are preserved in 
 - `9f20076b7fd5f74eb00c9b12fe79ee92240e27ab` — Gate 2 provenance documentation
 - `90f8523d305f1d2b420baa4e55f54993212248c8` — development workflow and CI definition
 - `7aca8cb7b887d84eb9ff145335e2afb41fab5f08` — clean-checkout pricing dependency correction
+- `6a66effa38d1770204b7926343047a40daae15fa` — GitHub backup and protection report
 
-Before this report commit, local `main` and `origin/main` both resolved to `7aca8cb7b887d84eb9ff145335e2afb41fab5f08` and the worktree was clean.
+After the report commit, local `main` and `origin/main` both resolved to `6a66effa38d1770204b7926343047a40daae15fa` and the worktree was clean.
 
 ## Automated verification
 
@@ -32,6 +33,7 @@ Before this report commit, local `main` and `origin/main` both resolved to `7aca
 - The first remote run identified a clean-checkout portability defect: `src/pricingContext.js` referenced a parent-workspace file.
 - The dependency was replaced with the repository's byte-identical `vendor/pricing.js` copy.
 - The second remote run completed successfully.
+- The report commit triggered a third remote run, which also completed successfully.
 
 No real credentials or secrets were identified in the repository scan. Environment files, credentials, caches, logs, temporary output and generated output remain excluded by `.gitignore`.
 
@@ -47,7 +49,9 @@ A classic branch-protection rule is configured for `main` with these practical s
 - A mandatory approval was intentionally not required because the current repository has a single owner workflow and this would create an avoidable lockout.
 - The successful CI workflow remains available on pushes and pull requests.
 
-GitHub explicitly marks this rule **Not enforced** because the repository is private and the current organization plan does not include enforcement for private repositories. Moving `J-Daw-Media` to GitHub Team or Enterprise would activate the configured protection. The rule is retained as future-ready configuration, but it must not be represented as actively enforced today.
+The repository was changed from private to public after an additional owner confirmation. GitHub's repository and branch APIs then confirmed `visibility: public`, `private: false`, `protected: true`, and branch-protection `enabled: true` for `main`. The protection rule is therefore active on the current plan.
+
+Required status checks are not part of the branch rule because GitHub did not offer the existing workflow as a selectable required check while the rule was configured. The `Test` workflow nevertheless runs automatically on every push and pull request. Pull requests, resolved conversations, linear history, force-push prevention and deletion prevention remain the enforced repository controls.
 
 ## Development workflow
 
@@ -76,4 +80,4 @@ This matches the verified Gate 2 production digest recorded before repository pr
 
 ## Final assessment
 
-The private GitHub backup is operational, reproducible and covered by passing remote CI. Repository protection has been configured as strongly as practical without owner lockout, but enforcement is blocked by the current GitHub organization plan. The source is ready for protected feature-branch development once plan enforcement is available; until then, the documented pull-request workflow is a procedural safeguard rather than a platform-enforced barrier.
+The public GitHub backup is operational, reproducible and covered by passing remote CI. The `main` branch protection is active and configured without creating a single-owner approval lockout. Future changes must follow the documented feature-branch and pull-request workflow. Public visibility exposes the repository source, Git history and Actions history to everyone, but the completed repository scan found no real credentials or secrets.
