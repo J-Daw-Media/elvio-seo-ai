@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { buildSeoBrief, evaluateOpportunity } from "../src/contentIntelligence.js";
 import { validateContentDraft } from "../src/contentProduction.js";
-import { buildArticleReview, buildExistingPageReview, buildGate4DryRun, chooseContentWorkflow, reconcileWixDraft, transitionContentState } from "../src/gate4Content.js";
+import { buildArticleReview, buildExistingPageReview, buildGate4DryRun, chooseContentWorkflow, reconcileWixDraft, transitionContentState, validateArticleStructure } from "../src/gate4Content.js";
 import { gate4DryRunExample } from "../src/gate4Examples.js";
 import { assertWixEndpointAllowed, buildWixDraftPayload, draftMappingRecord, htmlToWixRichContent, wixPhase2Contract } from "../src/wixDrafts.js";
 
@@ -52,7 +52,16 @@ test("Wix v3 payload preserves rich-content structure and forces publish false",
 
 test("Wix endpoint allowlist excludes update, publish, delete and arbitrary endpoints", () => {
   assert.equal(assertWixEndpointAllowed("https://www.wixapis.com/blog/v3/draft-posts"), true);
-  for (const url of ["https://www.wixapis.com/blog/v3/draft-posts/id", "https://www.wixapis.com/blog/v3/draft-posts/id/publish", "https://evil.example/blog/v3/draft-posts"]) assert.throws(() => assertWixEndpointAllowed(url), /NOT_ALLOWED/);
+  assert.equal(assertWixEndpointAllowed("https://www.wixapis.com/blog/v3/draft-posts/wix-draft-1", "GET"), true);
+  for (const [url, method] of [["https://www.wixapis.com/blog/v3/draft-posts/id", "POST"], ["https://www.wixapis.com/blog/v3/draft-posts/id/publish", "POST"], ["https://www.wixapis.com/blog/v3/draft-posts", "GET"], ["https://evil.example/blog/v3/draft-posts/id", "GET"]]) assert.throws(() => assertWixEndpointAllowed(url, method), /NOT_ALLOWED/);
+});
+
+test("article structure enforces one matching H1, exact H2 order and inquiry CTA", () => {
+  const valid = { title: "Titel", h1: "Titel", h2s: ["Een", "Twee"], bodyHtml: "<h1>Titel</h1><h2>Een</h2><p>Tekst</p><h2>Twee</h2><p>Tekst</p>", cta: "Vraag offerte aan via https://www.djelvio.nl/contact." };
+  assert.equal(validateArticleStructure(valid).valid, true);
+  assert.ok(validateArticleStructure({ ...valid, bodyHtml: `<h1>Anders</h1>${valid.bodyHtml}` }).errors.includes("single_h1_required"));
+  assert.ok(validateArticleStructure({ ...valid, h2s: ["Twee", "Een"] }).errors.includes("h2_structure_mismatch"));
+  assert.ok(validateArticleStructure({ ...valid, cta: "Lees meer" }).errors.includes("inquiry_cta_mismatch"));
 });
 
 test("approval state is fingerprint-bound and content changes require fresh approval", () => {
@@ -82,7 +91,15 @@ test("Gate 4 dry run provides both workflows and zero external mutations", () =>
   const result = gate4DryRunExample();
   assert.equal(result.pageReview.kind, "existing_page_optimization");
   assert.equal(result.articleReview.kind, "new_article");
+  assert.equal(result.articleReview.structure.valid, true);
+  assert.equal(result.articleReview.seoEvidenceStatus, "pending_first_party_search_evidence");
+  assert.equal(result.articleReview.imageStatus, "image_pending");
+  assert.equal(result.articleReview.draft.h1, result.articleReview.draft.title);
+  assert.equal(result.articleReview.draft.bodyHtml.match(/<h1>/gi).length, 1);
   assert.equal(result.articleReview.wixDryRun.payload.publish, false);
+  const wixHeadings = result.articleReview.wixDryRun.payload.draftPost.richContent.nodes.filter((node) => node.type === "HEADING");
+  assert.deepEqual(wixHeadings.map((node) => node.headingData.level), [1, 2, 2, 2, 2, 2, 2, 2]);
+  assert.ok(JSON.stringify(result.articleReview.wixDryRun).includes("https://www.djelvio.nl/contact"));
   assert.equal(result.writesPerformed, 0);
   assert.equal(result.wixDraftsCreated, 0);
   assert.equal(result.livePagesModified, 0);

@@ -95,6 +95,11 @@ function brief(record = {}) {
       contentFingerprint: text(record.contentFingerprint || record.fingerprint),
       wixDraftReadiness: text(record.wixDraftReadiness || "not_approved"),
       intendedWixAction: text(record.intendedWixAction || "owner_review_only"),
+      editorialReadiness: text(record.editorialReadiness),
+      seoEvidenceStatus: text(record.seoEvidenceStatus),
+      cannibalizationAssessment: record.cannibalizationAssessment || null,
+      factualVerification: record.factualVerification || null,
+      imageStatus: text(record.imageStatus || record.imageryStatus || "image_pending"),
       publicationAuthorized: false,
     },
   };

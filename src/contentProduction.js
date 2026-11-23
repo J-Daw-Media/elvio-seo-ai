@@ -42,7 +42,7 @@ export function prepareDutchDraft(brief, facts = {}) {
     id: stableId("seo-content-draft", { briefId: brief.id, version: 1 }), briefId: brief.id, language: "nl-NL",
     destination: brief.targetPage ? "existing_page_proposal" : "wix_blog_draft_candidate",
     title, slug, metaDescription: brief.proposedMetaDescription || `Praktische informatie over ${brief.primaryTopic.toLowerCase()}, de voorbereiding en de mogelijkheden bij Allround DJ Elvio.`,
-    h1: brief.primaryTopic, h2s: ["Welke invulling past bij het evenement?", "Voorbereiding en techniek", "Vrijblijvend een offerte aanvragen"],
+    h1: facts.h1 || title, h2s: facts.h2s || ["Welke invulling past bij het evenement?", "Voorbereiding en techniek", "Vrijblijvend een offerte aanvragen"],
     bodyHtml: facts.fullBodyHtml || paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("\n"),
     faq: brief.questionsToAnswer.map((question) => ({ question, answerStatus: "requires_editorial_answer" })),
     internalLinks: brief.internalLinks, cta: "Vraag vrijblijvend een offerte aan via https://www.djelvio.nl/contact.",

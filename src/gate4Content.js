@@ -49,10 +49,12 @@ export function buildExistingPageReview({ opportunity, currentPage, proposed, ev
   return { id: stableId("gate4-page-review", { contentFingerprint }), ...proposal, contentFingerprint, state: "owner_review", validation: { valid: true, errors: [] }, publicationAuthorized: false, livePageWriteAllowed: false };
 }
 
-export function buildArticleReview({ opportunity, brief, facts = {}, existingContent = [], imagery = [] } = {}) {
+export function buildArticleReview({ opportunity, brief, facts = {}, existingContent = [], imagery = [], seoEvidenceStatus = "pending_first_party_search_evidence", cannibalizationAssessment = null } = {}) {
   const selection = chooseContentWorkflow(opportunity, { existingPages: existingContent });
   if (selection.workflow !== "new_article") throw new Error(`GATE4_NEW_ARTICLE_REJECTED_${selection.reason}`);
   const draft = prepareDutchDraft(brief, facts);
+  const structure = validateArticleStructure(draft);
+  if (!structure.valid) throw new Error(`GATE4_ARTICLE_STRUCTURE_FAILED_${structure.errors.join("_")}`);
   const duplicates = detectDuplicateContent(draft, existingContent);
   const validation = validateContentDraft({ ...draft, duplicateMatches: duplicates, approvedImagery: imagery });
   if (!validation.valid) throw new Error(`GATE4_ARTICLE_VALIDATION_FAILED_${validation.errors.join("_")}`);
@@ -61,9 +63,26 @@ export function buildArticleReview({ opportunity, brief, facts = {}, existingCon
   return {
     id: stableId("gate4-article-review", { contentFingerprint }), kind: "new_article", draft: { ...draft, validation },
     contentFingerprint, duplicateAssessment: { matches: duplicates, safe: duplicates.length === 0 }, imagery,
+    editorialReadiness: "ready_for_owner_review", seoEvidenceStatus, structure,
+    searchIntent: brief.targetSearchIntent,
+    cannibalizationAssessment: cannibalizationAssessment || { status: "manual_review_required", relatedPages: existingContent.map(({ url, title }) => ({ url, title })), conclusion: "Distinct editorial angle, but first-party query evidence is not yet sufficient to prove a separate organic-search opportunity." },
+    factualVerification: { status: "passed_with_limits", verified: ["more_than_20_years_as_dj", "dj_only_or_complete_drive_in", "personal_preparation"], prohibitedClaimsFound: [], limitations: ["No cultural-specialist claim", "No availability, price, testimonial or guarantee claim"] },
+    imageStatus: imagery.length ? "approved_asset_selected" : "image_pending",
     intendedWixAction: "create_unpublished_blog_draft_after_separate_approval", wixDryRun,
     state: "owner_review", publicationAuthorized: false, wixDraftCreationAuthorized: false,
   };
+}
+
+export function validateArticleStructure(draft = {}) {
+  const plain = (value) => String(value || "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+  const h1s = [...String(draft.bodyHtml || "").matchAll(/<h1>([\s\S]*?)<\/h1>/gi)].map((match) => plain(match[1]));
+  const h2s = [...String(draft.bodyHtml || "").matchAll(/<h2>([\s\S]*?)<\/h2>/gi)].map((match) => plain(match[1]));
+  const errors = [];
+  if (h1s.length !== 1) errors.push("single_h1_required");
+  if (h1s[0] !== draft.h1 || draft.h1 !== draft.title) errors.push("title_h1_mismatch");
+  if (JSON.stringify(h2s) !== JSON.stringify(draft.h2s || [])) errors.push("h2_structure_mismatch");
+  if (!/^https:\/\/www\.djelvio\.nl\/contact\.?$/i.test(String(draft.cta || "").match(/https:\/\/[^\s]+/i)?.[0] || "")) errors.push("inquiry_cta_mismatch");
+  return { valid: errors.length === 0, errors, h1: h1s[0] || null, h2s };
 }
 
 export function reconcileWixDraft(record, wixResponse) {

@@ -36,10 +36,27 @@ export function htmlToWixRichContent(html = "") {
   for (const match of html.matchAll(matcher)) {
     const text = match[2].replace(/<[^>]+>/g, " ").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
     if (!text) continue;
-    nodes.push({ type: match[1].toLowerCase() === "p" ? "PARAGRAPH" : "HEADING", nodes: [{ type: "TEXT", textData: { text } }], ...(match[1].toLowerCase() === "p" ? {} : { headingData: { level: Number(match[1][1]) } }) });
+    const inlineNodes = match[1].toLowerCase() === "p" ? inlineWixTextNodes(match[2]) : [{ type: "TEXT", textData: { text } }];
+    nodes.push({ type: match[1].toLowerCase() === "p" ? "PARAGRAPH" : "HEADING", nodes: inlineNodes, ...(match[1].toLowerCase() === "p" ? {} : { headingData: { level: Number(match[1][1]) } }) });
   }
   if (!nodes.length) throw new Error("WIX_RICH_CONTENT_EMPTY");
   return { nodes };
+}
+
+function inlineWixTextNodes(html) {
+  const nodes = [];
+  const pattern = /<a\s+href=["'](https:\/\/www\.djelvio\.nl\/[a-z0-9\-/?#=&]*)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  let cursor = 0;
+  for (const match of html.matchAll(pattern)) {
+    const before = html.slice(cursor, match.index).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    if (before.trim()) nodes.push({ type: "TEXT", textData: { text: before } });
+    const text = match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    nodes.push({ type: "TEXT", textData: { text, decorations: [{ type: "LINK", linkData: { link: { url: match[1], target: "SELF" } } }] } });
+    cursor = match.index + match[0].length;
+  }
+  const after = html.slice(cursor).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+  if (after.trim()) nodes.push({ type: "TEXT", textData: { text: after } });
+  return nodes.length ? nodes : [{ type: "TEXT", textData: { text: html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() } }];
 }
 
 export function draftMappingRecord({ contentFingerprint, wixDraftId = null, status = "prepared" } = {}) {
@@ -47,9 +64,12 @@ export function draftMappingRecord({ contentFingerprint, wixDraftId = null, stat
   return { id: stableId("wix-draft-mapping", { contentFingerprint }), contentFingerprint, wixDraftId, status, publicationAuthorized: false };
 }
 
-export function assertWixEndpointAllowed(url) {
+export function assertWixEndpointAllowed(url, method = "POST") {
   const endpoint = new URL(url);
-  if (endpoint.origin !== "https://www.wixapis.com" || endpoint.pathname !== "/blog/v3/draft-posts") throw new Error("WIX_ENDPOINT_NOT_ALLOWED");
+  const normalizedMethod = String(method).toUpperCase();
+  const create = normalizedMethod === "POST" && endpoint.pathname === "/blog/v3/draft-posts";
+  const retrieve = normalizedMethod === "GET" && /^\/blog\/v3\/draft-posts\/[a-z0-9-]{1,64}$/i.test(endpoint.pathname);
+  if (endpoint.origin !== "https://www.wixapis.com" || (!create && !retrieve)) throw new Error("WIX_ENDPOINT_NOT_ALLOWED");
   return true;
 }
 

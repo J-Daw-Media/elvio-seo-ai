@@ -55,29 +55,37 @@ export function gate4DryRunExample() {
     questionsToAnswer: ["Hoe combineer je verschillende muziekstijlen?", "Welke informatie heeft de DJ vooraf nodig?", "Wanneer past DJ-only of een complete drive-in?"],
     internalLinks: ["/bruiloftsfeest", "/contact"],
   });
+  const articleH1 = "Muziek voor een internationale bruiloft: zo verbind je alle gasten";
+  const articleH2s = ["Begin met jullie gezamenlijke muzikale verhaal", "Maak ruimte voor talen, culturen en generaties", "Leg traditionele momenten vooraf vast", "Werk met must-play en do-not-play keuzes", "Stem de techniek en planning af met de locatie", "Lees de dansvloer en blijf flexibel", "DJ-only of een complete drive-in"];
   const fullBodyHtml = [
-    "<h1>Muziek voor een internationale bruiloft: zo verbind je alle gasten</h1>",
-    "<p>Op een internationale bruiloft komen vaak verschillende families, talen, leeftijden en muzikale gewoonten samen. De muziek hoeft die verschillen niet weg te poetsen. Een goed voorbereide avond geeft juist meerdere groepen een herkenbaar moment en bouwt stap voor stap naar een gezamenlijke dansvloer.</p>",
-    "<h2>Begin met jullie eigen verhaal</h2>",
-    "<p>Maak eerst duidelijk welke muziek bij jullie als bruidspaar hoort. Denk aan nummers uit jullie jeugd, muziek die thuis werd gedraaid en liedjes die belangrijk zijn voor familie of vrienden. Deze basis helpt de DJ om keuzes te maken die persoonlijk voelen, zonder dat de avond een lange lijst losse verzoeknummers wordt.</p>",
-    "<h2>Geef verschillende generaties een plek</h2>",
-    "<p>Internationale gasten brengen vaak uiteenlopende voorkeuren mee. Oudere familieleden herkennen andere nummers dan vrienden die vooral op recente hits dansen. Door stijlen en periodes logisch af te wisselen kan de energie groeien, terwijl meerdere generaties zich betrokken voelen. Niet ieder verzoek hoeft direct te worden gespeeld; timing en samenhang blijven belangrijk.</p>",
-    "<h2>Plan vaste momenten, maar houd ruimte</h2>",
-    "<p>De openingsdans, binnenkomst en eventuele traditionele momenten verdienen vooraf duidelijke afspraken. Voor het vrije feestgedeelte is flexibiliteit juist waardevol. De reactie van de gasten bepaalt welke richting op dat moment werkt. Een voorbereiding met voorkeuren, belangrijke nummers en muziek die jullie liever niet horen geeft houvast zonder de dansvloer vast te zetten.</p>",
+    `<h1>${articleH1}</h1>`,
+    "<p>Op een internationale bruiloft komen vaak families, talen, leeftijden en muzikale voorkeuren samen. Een bruikbaar muziekplan probeert die verschillen niet weg te poetsen. Het geeft verschillende groepen herkenbare momenten en bouwt tegelijk naar een dansvloer waarop gasten samen kunnen vieren.</p>",
+    "<h2>Begin met jullie gezamenlijke muzikale verhaal</h2>",
+    "<p>Bespreek eerst welke muziek bij jullie als bruidspaar hoort. Denk aan nummers uit jullie jeugd, muziek die thuis werd gedraaid en liedjes die verbonden zijn aan familie, vrienden of belangrijke plaatsen. Benoem ook in welke talen bepaalde nummers belangrijk zijn. Zo ontstaat een persoonlijke basis zonder dat de avond een reeks losse verzoeknummers wordt.</p>",
+    "<h2>Maak ruimte voor talen, culturen en generaties</h2>",
+    "<p>Gasten hoeven niet ieder nummer te kennen om samen te kunnen dansen. Herkenbare ritmes, refreinen en zorgvuldig gekozen overgangen kunnen verschillende groepen bij elkaar brengen. Oudere familieleden reageren mogelijk op andere periodes dan vrienden die recente hits verwachten. De voorbereiding moet daarom duidelijk maken welke stijlen en talen vertegenwoordigd zijn, zonder te veronderstellen dat één keuze voor een hele cultuur spreekt.</p>",
+    "<h2>Leg traditionele momenten vooraf vast</h2>",
+    "<p>Een entree, openingsdans, familiedans of ander traditioneel moment kan een specifieke opname, versie of starttijd vereisen. Leg per moment vast welk nummer nodig is, wie het teken geeft en of de locatie microfoons of andere techniek verzorgt. Laat het bruidspaar de definitieve keuze bevestigen; de DJ hoeft geen betekenis of traditie in te vullen die niet expliciet is besproken.</p>",
+    "<h2>Werk met must-play en do-not-play keuzes</h2>",
+    "<p>Een korte must-playlijst geeft richting aan belangrijke momenten en nummers die echt bij jullie horen. Een do-not-playlijst voorkomt muziek die niet past of een ongewenste associatie heeft. Houd beide lijsten overzichtelijk. Voor het vrije feestgedeelte blijft dan voldoende ruimte om verzoeken te beoordelen en te reageren op wat op de dansvloer werkt.</p>",
+    "<h2>Stem de techniek en planning af met de locatie</h2>",
+    "<p>Controleer vooraf de beschikbare geluidsinstallatie, aansluitmogelijkheden, opbouwtijd, geluidslimieten en de positie van de DJ. Spreek met de locatie of ceremoniemeester af wie wijzigingen in het programma doorgeeft. Dat voorkomt onduidelijkheid wanneer een speech uitloopt, een traditioneel moment verschuift of meerdere talen in aankondigingen worden gebruikt.</p>",
+    "<h2>Lees de dansvloer en blijf flexibel</h2>",
+    "<p>Een planning geeft houvast, maar de reactie van de gasten bepaalt de volgorde tijdens het feest. Soms werkt een langer blok binnen één stijl; op een ander moment is een snellere overgang nodig om meerdere groepen mee te nemen. De DJ gebruikt de afgesproken voorkeuren als kader en past de route binnen dat kader aan de dansvloer aan.</p>",
     "<h2>DJ-only of een complete drive-in</h2>",
-    "<p>Heeft de locatie al passende techniek, dan kan een DJ-only invulling geschikt zijn. Is er nog geluid en licht nodig, dan kan een complete drive-in worden besproken. Welke vorm past, hangt af van de locatie, het aantal gasten, de speelduur en het programma. De definitieve invulling wordt daarom altijd per aanvraag bevestigd.</p>",
-    "<h2>Bespreek wensen vooraf</h2>",
-    "<p>Met meer dan 20 jaar ervaring als DJ bereidt DJ Elvio de muziek samen met het bruidspaar voor. Voor een gerichte bespreking zijn de datum, locatie, planning, samenstelling van de gasten en belangrijkste muzikale wensen nodig. Zo ontstaat een plan dat ruimte laat om tijdens het feest op de dansvloer te reageren.</p>",
-    "<p>Willen jullie bespreken welke muzikale aanpak bij jullie internationale bruiloft past? Vraag dan vrijblijvend een offerte aan via de contactpagina.</p>",
+    "<p>Heeft de locatie passende techniek, dan kan een DJ-only invulling worden besproken. Is er nog geluid en licht nodig, dan kan een complete drive-in passend zijn. De benodigde opstelling hangt af van de ruimte, het aantal gasten, het programma en de afspraken met de locatie. De definitieve invulling en beschikbaarheid worden altijd per aanvraag bevestigd.</p>",
+    "<p>Met meer dan 20 jaar ervaring als DJ bereidt DJ Elvio de muziek samen met het bruidspaar voor. Willen jullie bespreken welke muzikale en technische aanpak bij jullie bruiloft past? Vraag dan vrijblijvend een offerte aan via <a href=\"https://www.djelvio.nl/contact\">de contactpagina van DJ Elvio</a>.</p>",
   ].join("\n");
   const articleReview = buildArticleReview({
     opportunity: articleOpportunity, brief,
-    facts: { fullBodyHtml },
+    facts: { fullBodyHtml, h1: articleH1, h2s: articleH2s },
     existingContent: [
       { id: "page-wedding", url: "/bruiloftsfeest", title: "Bruiloft DJ huren", description: "Commerciële servicepagina voor DJ-only en complete drive-in." },
       { id: "article-day-programme", url: "/post/dagprogramma-bruiloft", title: "Dagprogramma bruiloft", description: "Informatie over de planning van de trouwdag." },
     ],
     imagery: [],
+    seoEvidenceStatus: "pending_first_party_search_evidence",
+    cannibalizationAssessment: { status: "editorially_distinct_seo_evidence_pending", relatedPages: [{ url: "/bruiloftsfeest", overlap: "commercial wedding service" }, { url: "/post/dagprogramma-bruiloft", overlap: "wedding planning information" }], distinctAngle: "multilingual and multi-generational music planning", conclusion: "The article is editorially useful and distinct in angle, but current evidence does not prove enough separate query demand to authorize publication." },
   });
   return buildGate4DryRun({ pageReview, articleReview });
 }
