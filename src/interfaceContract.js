@@ -117,14 +117,32 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
     kind, id: text(row?.id || row?.executionId), status: text(row?.status || (row ? "success" : "unavailable")),
     completedAt: iso(row?.completedAt || row?.generatedAt), durationMs: number(row?.durationMs), warnings: asArray(row?.warnings).map(text),
   }));
+  const sourceAvailability = (name) => {
+    const value = input.availability?.[name];
+    if (typeof value === "string") return { status: value, lastAttemptAt: null, lastSuccessfulAt: null, reason: null };
+    return {
+      status: text(value?.status || "unknown"),
+      lastAttemptAt: iso(value?.lastAttemptAt),
+      lastSuccessfulAt: iso(value?.lastSuccessfulAt),
+      reason: text(value?.reason),
+    };
+  };
+  const searchConsole = sourceAvailability("searchConsole");
+  const ga4 = sourceAvailability("ga4");
   return {
     schemaVersion: seoInterfaceSchemaVersion,
     generatedAt: new Date(options.now || Date.now()).toISOString(),
     readOnly: true,
     seoOverview: {
       latestSuccessfulCollectionDate: iso(latestDate), freshness: freshness(latestDate, new Date(options.now || Date.now())),
-      searchConsoleAvailability: text(input.availability?.searchConsole || "unavailable"),
-      ga4Availability: text(input.availability?.ga4 || "unavailable"),
+      searchConsoleAvailability: searchConsole.status,
+      searchConsoleLastAttemptDate: searchConsole.lastAttemptAt,
+      searchConsoleLastSuccessfulCollectionDate: searchConsole.lastSuccessfulAt,
+      searchConsoleStatusReason: searchConsole.reason,
+      ga4Availability: ga4.status,
+      ga4LastAttemptDate: ga4.lastAttemptAt,
+      ga4LastSuccessfulCollectionDate: ga4.lastSuccessfulAt,
+      ga4StatusReason: ga4.reason,
       activeOpportunityCount: opportunities.length, technicalFindingCount: findings.length,
       contentBriefCount: briefs.length, pendingReviewCount: reviews.filter((item) => item.reviewStatus === "pending_review").length,
       attributionCoverage: { evaluated, sufficientSourceEvidence: sufficient, unknownSource: number(metrics.unknownSourceInquiries) },
