@@ -26,7 +26,8 @@ export function createInterfaceHandler({ expectedToken, readModel, now = () => D
   const rates = new Map();
   return async (req, res) => {
     const authorization = String(req.headers.authorization || "");
-    if (!tokenMatches(authorization.startsWith("Bearer ") ? authorization.slice(7) : "", expectedToken)) return json(res, 401, { error: "Unauthorized" });
+    const suppliedToken = String(req.headers["x-seo-interface-token"] || (authorization.startsWith("Bearer ") ? authorization.slice(7) : ""));
+    if (!tokenMatches(suppliedToken, expectedToken)) return json(res, 401, { error: "Unauthorized" });
     if (req.method !== "GET") return json(res, 405, { error: "Method not allowed" }, { allow: "GET" });
     const url = new URL(req.url || "/", "https://internal.invalid");
     if (url.pathname !== "/v1/seo-intelligence") return json(res, 404, { error: "Not found" });

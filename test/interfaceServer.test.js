@@ -21,5 +21,5 @@ test("interface server requires auth, is GET-only and returns the read-only cont
   const handler = createInterfaceHandler({ expectedToken: "secret", readModel, now: () => Date.parse("2026-11-23T12:00:00Z") });
   const unauth = responseRecorder(); await handler({ method: "GET", url: "/v1/seo-intelligence", headers: {}, socket: {} }, unauth); assert.equal(unauth.status, 401);
   const write = responseRecorder(); await handler({ method: "POST", url: "/v1/seo-intelligence", headers: { authorization: "Bearer secret" }, socket: {} }, write); assert.equal(write.status, 405);
-  const read = responseRecorder(); await handler({ method: "GET", url: "/v1/seo-intelligence?limit=25", headers: { authorization: "Bearer secret" }, socket: {} }, read); assert.equal(read.status, 200); assert.equal(JSON.parse(read.body).readOnly, true);
+  const read = responseRecorder(); await handler({ method: "GET", url: "/v1/seo-intelligence?limit=25", headers: { "x-seo-interface-token": "secret" }, socket: {} }, read); assert.equal(read.status, 200); assert.equal(JSON.parse(read.body).readOnly, true);
 });
