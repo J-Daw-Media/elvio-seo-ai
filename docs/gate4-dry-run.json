@@ -187,7 +187,8 @@
       "payload": {
         "draftPost": {
           "title": "Muziek voor een internationale bruiloft: zo verbind je alle gasten",
-          "slug": "muziek-voor-een-internationale-bruiloft-zo-verbind-je-alle-gasten",
+          "seoSlug": "muziek-voor-een-internationale-bruiloft-zo-verbind-je-alle-gasten",
+          "memberId": "ed017bc0-3db1-467e-9f2a-a345b6720e26",
           "excerpt": "Praktische tips voor muziek op een internationale bruiloft, met aandacht voor verschillende culturen, generaties en momenten van de dag.",
           "richContent": {
             "nodes": [

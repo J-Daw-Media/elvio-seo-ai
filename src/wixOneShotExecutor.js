@@ -31,7 +31,7 @@ export class WixOneShotExecutor {
       const create = await this.request(wixPhase2Contract.draftEndpoint, "POST", session.credential, siteId, wixDryRun.payload);
       if (!create?.draftPost?.id) throw new Error("WIX_CREATE_RESPONSE_UNCERTAIN");
       record = await this.ledger.transition(fingerprint, record.version, "created", { wixDraftId: create.draftPost.id, createResponseStatus: create.responseStatus || 200 });
-      const retrieved = await this.request(`${wixPhase2Contract.draftEndpoint}/${encodeURIComponent(record.wixDraftId)}`, "GET", session.credential, siteId);
+      const retrieved = await this.request(`${wixPhase2Contract.draftEndpoint}/${encodeURIComponent(record.wixDraftId)}?fieldsets=RICH_CONTENT`, "GET", session.credential, siteId);
       const verification = verifyRetrievedDraft(retrieved?.draftPost, wixDryRun.payload.draftPost, record.wixDraftId, siteId);
       record = await this.ledger.transition(fingerprint, record.version, "verified", { verifiedAt: this.now(), verification, receipt: redactedReceipt(record, verification) });
       return { status: "verified", postRequests: 1, wixDraftId: record.wixDraftId, receipt: record.receipt };
@@ -62,7 +62,7 @@ export class WixOneShotExecutor {
     try {
       session = await this.credentialSession.acquire();
       if (!session?.credential || session.siteId !== siteId) throw new Error("WIX_CREDENTIAL_SITE_MISMATCH");
-      const retrieved = await this.request(`${wixPhase2Contract.draftEndpoint}/${encodeURIComponent(wixDraftId)}`, "GET", session.credential, siteId);
+      const retrieved = await this.request(`${wixPhase2Contract.draftEndpoint}/${encodeURIComponent(wixDraftId)}?fieldsets=RICH_CONTENT`, "GET", session.credential, siteId);
       const verification = verifyRetrievedDraft(retrieved?.draftPost, wixDryRun.payload.draftPost, wixDraftId, siteId);
       record = await this.ledger.transition(approvedFingerprint, record.version, "verified", { wixDraftId, verifiedAt: this.now(), verification, reconciledWithoutCreate: true, receipt: redactedReceipt({ ...record, wixDraftId }, verification) });
       return { status: "verified", reconciled: true, postRequests: 0, wixDraftId, receipt: record.receipt };
@@ -91,6 +91,8 @@ function verifyCandidate({ review, wixDryRun, approvedFingerprint, siteId }) {
   if (siteId !== approvedGate4Candidate.siteId || wixDryRun?.siteId !== siteId) throw new Error("WIX_SITE_ID_MISMATCH");
   if (review.state !== "approved_for_draft_creation" || review.publicationAuthorized) throw new Error("WIX_DRAFT_APPROVAL_REQUIRED");
   if (wixDryRun.payload?.publish !== false || wixDryRun.payload?.draftPost?.media) throw new Error("WIX_DRAFT_PAYLOAD_NOT_APPROVED");
+  if (wixDryRun.payload?.draftPost?.memberId !== wixPhase2Contract.memberId) throw new Error("WIX_WRITER_IDENTITY_MISMATCH");
+  if (!wixDryRun.payload?.draftPost?.seoSlug || wixDryRun.payload?.draftPost?.slug) throw new Error("WIX_SEO_SLUG_CONTRACT_INVALID");
   assertWixEndpointAllowed(wixDryRun.endpoint, "POST");
 }
 
@@ -106,9 +108,10 @@ export function normalizeWixDraft(draft = {}) {
   const headings = nodes.filter((node) => node.type === "HEADING").map((node) => `${node.level}:${node.parts.map((part) => part.text).join("")}`);
   const paragraphs = nodes.filter((node) => node.type === "PARAGRAPH").map((node) => node.parts.map((part) => part.text).join(""));
   const links = nodes.flatMap((node) => node.parts.flatMap((part) => part.links));
-  const canonicalContent = { title: draft.title ?? null, slug: draft.slug ?? null, excerpt: draft.excerpt ?? null, seoTitle, seoDescription, nodes };
+  const seoSlug = draft.seoSlug ?? draft.slug ?? null;
+  const canonicalContent = { title: draft.title ?? null, seoSlug, excerpt: draft.excerpt ?? null, seoTitle, seoDescription, nodes };
   return {
-    id: draft.id ?? null, siteId: draft.siteId ?? null, title: draft.title ?? null, slug: draft.slug ?? null, excerpt: draft.excerpt ?? null,
+    id: draft.id ?? null, siteId: draft.siteId ?? null, memberId: draft.memberId ?? null, title: draft.title ?? null, seoSlug, excerpt: draft.excerpt ?? null,
     seoTitle, seoDescription, nodes, headings, paragraphs, links,
     contentChecksum: sha256(canonicalContent), imageIdentity: draft.media?.wixMedia?.image || null,
     status: draft.status ?? null, publishedDate: draft.publishedDate ?? null,
@@ -119,8 +122,9 @@ export function verifyRetrievedDraft(actual, expected, expectedId, expectedSiteI
   if (!actual || actual.id !== expectedId) throw new Error("WIX_RETRIEVED_DRAFT_ID_MISMATCH");
   const normalizedActual = normalizeWixDraft(actual);
   const normalizedExpected = normalizeWixDraft(expected);
-  if (actual.publishedDate || actual.status && String(actual.status).toUpperCase() !== "DRAFT") throw new Error("WIX_RETRIEVED_DRAFT_PUBLISHED");
-  for (const field of ["title", "slug", "excerpt", "seoTitle", "seoDescription", "contentChecksum", "imageIdentity"]) {
+  const status = String(actual.status || "").toUpperCase();
+  if (actual.publishedDate || status && !["DRAFT", "UNPUBLISHED"].includes(status)) throw new Error("WIX_RETRIEVED_DRAFT_PUBLISHED");
+  for (const field of ["title", "seoSlug", "excerpt", "seoTitle", "seoDescription", "contentChecksum", "imageIdentity", "memberId"]) {
     if (normalizedActual[field] !== normalizedExpected[field]) throw new Error(`WIX_RETRIEVED_${field.toUpperCase()}_MISMATCH`);
   }
   for (const field of ["headings", "paragraphs", "links", "nodes"]) {
@@ -132,7 +136,7 @@ export function verifyRetrievedDraft(actual, expected, expectedId, expectedSiteI
   const unverifiableFields = [];
   if (!normalizedActual.siteId) unverifiableFields.push("wix_site_identity_response_field");
   return {
-    unpublished: true, title: true, slug: true, seoTitle: true, seoDescription: true, completeBody: true,
+    unpublished: true, title: true, seoSlug: true, seoTitle: true, seoDescription: true, completeBody: true,
     headings: true, paragraphs: true, internalLinks: true, cta: true, imageIdentity: true,
     expectedContentChecksum: normalizedExpected.contentChecksum, retrievedContentChecksum: normalizedActual.contentChecksum,
     requestBoundSiteIdentity: expectedSiteId, unverifiableFields,

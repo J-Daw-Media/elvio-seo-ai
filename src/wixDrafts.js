@@ -2,6 +2,7 @@ import { stableId, sha256 } from "./identity.js";
 
 export const wixPhase2Contract = Object.freeze({
   siteId: "fe9762c6-cdbd-404c-ba42-c2b834b052e2",
+  memberId: "ed017bc0-3db1-467e-9f2a-a345b6720e26",
   draftEndpoint: "https://www.wixapis.com/blog/v3/draft-posts",
   liveCredentialsAvailable: false,
   draftWritesEnabled: false,
@@ -21,7 +22,7 @@ export function buildWixDraftPayload(draft, image = null) {
     siteId: wixPhase2Contract.siteId,
     endpoint: wixPhase2Contract.draftEndpoint,
     payload: { draftPost: {
-      title: draft.title, slug: draft.slug, excerpt: draft.metaDescription,
+      title: draft.title, seoSlug: draft.slug, memberId: wixPhase2Contract.memberId, excerpt: draft.metaDescription,
       richContent: htmlToWixRichContent(draft.bodyHtml),
       seoData: { tags: [{ type: "title", children: draft.title }, { type: "meta", props: { name: "description", content: draft.metaDescription } }] },
       media: image ? { wixMedia: { image: image.sourceUrl } } : undefined,

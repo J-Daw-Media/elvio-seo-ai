@@ -44,6 +44,9 @@ test("Wix v3 payload preserves rich-content structure and forces publish false",
   const payload = buildWixDraftPayload(draft);
   assert.equal(payload.payload.publish, false);
   assert.deepEqual(payload.payload.fieldsets, ["RICH_CONTENT", "URL"]);
+  assert.equal(payload.payload.draftPost.seoSlug, "titel");
+  assert.equal(payload.payload.draftPost.slug, undefined);
+  assert.equal(payload.payload.draftPost.memberId, wixPhase2Contract.memberId);
   assert.deepEqual(payload.payload.draftPost.richContent.nodes.map((node) => node.type), ["HEADING", "PARAGRAPH"]);
   assert.equal(wixPhase2Contract.publishEndpointAllowed, false);
   assert.equal(payload.publishAllowed, false);
