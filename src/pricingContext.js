@@ -1,4 +1,4 @@
-import { calculateCorporateEventPrice, calculatePrivateEventPrice } from "../../src/pricing.js";
+import { calculateCorporateEventPrice, calculatePrivateEventPrice } from "../vendor/pricing.js";
 
 export function verifiedPricingContext() {
   const context = {
@@ -15,7 +15,7 @@ export function verifiedPricingContext() {
       from51To100: calculateCorporateEventPrice({ eventType: "Company Event", guests: 51, duration: "4 hours" }).finalPrice,
     },
   };
-  return { source: "src/pricing.js", verifiedAtRuntime: true, context };
+  return { source: "vendor/pricing.js", verifiedAtRuntime: true, context };
 }
 
 export function compareRequestedPricing(requested) {
