@@ -74,6 +74,15 @@ test("full synthetic execution creates once, verifies content, revokes credentia
   const article = await s.getArticleByFingerprint(prepared.approvedFingerprint, prepared.siteId); assert.deepEqual(article.verifiedWixDraftIds, ["draft-1"]); assert.equal(article.activeAttemptId, null);
 });
 
+test("a fresh-process replay preserves the verified credential-revocation evidence", async () => {
+  const prepared = input(); const s = await store(); const a = auth(prepared); s.addAuthorization(a); const calls = [];
+  const options = { store: s, authorization: a, parentAttemptId: legacyId, seoSlug: prepared.wixDryRun.payload.draftPost.seoSlug, preparedInput: prepared, fetchImpl: fetcher(prepared, calls) };
+  await executeAuthorizedWixDraft({ ...options, credentialSession: credentials() });
+  const replay = await executeAuthorizedWixDraft({ ...options, credentialSession: credentials() });
+  assert.equal(replay.replayBlocked, true); assert.deepEqual(calls, ["POST", "GET"]);
+  const attempt = await s.getAttempt(a.attemptId); assert.equal(attempt.credentialRevoked, true); assert.ok(attempt.credentialRevocationVerifiedAt);
+});
+
 test("lost Wix response quarantines attempt and blocks another authorization", async () => {
   const prepared = input(); const s = await store(); const a = auth(prepared, "1"); s.addAuthorization(a); const calls = [];
   await assert.rejects(() => executeAuthorizedWixDraft({ store: s, authorization: a, parentAttemptId: legacyId, credentialSession: credentials(), preparedInput: prepared, fetchImpl: fetcher(prepared, calls, { loseCreate: true }) }));
