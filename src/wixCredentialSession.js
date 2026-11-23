@@ -12,7 +12,8 @@ export class SecretManagerWixCredentialSession {
     if (!response.ok) throw new Error(`WIX_SECRET_ACCESS_HTTP_${response.status}`);
     const encoded = (await response.json()).payload?.data;
     if (!encoded) throw new Error("WIX_SECRET_PAYLOAD_MISSING");
-    return { credential: Buffer.from(encoded, "base64").toString("utf8"), siteId: this.siteId, secretVersion: name };
+    this.lastSession = { credential: Buffer.from(encoded, "base64").toString("utf8"), siteId: this.siteId, secretVersion: name };
+    return this.lastSession;
   }
 
   async revoke(session) { await this.revokeCredential({ siteId: session.siteId, secretVersion: session.secretVersion }); }

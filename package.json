@@ -6,6 +6,8 @@
   "scripts": {
     "test": "node --test",
     "check": "node src/cli.js --dry-run",
-    "gate4:dry-run": "node scripts/gate4-dry-run.js"
+    "gate4:dry-run": "node scripts/gate4-dry-run.js",
+    "gate4g:rehearse": "node scripts/gate4g-synthetic-rehearsal.js",
+    "gate4g:execute": "node scripts/gate4g-production-one-shot.js"
   }
 }
