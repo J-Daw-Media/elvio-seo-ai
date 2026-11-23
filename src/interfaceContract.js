@@ -148,6 +148,9 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
   };
   const searchConsole = sourceAvailability("searchConsole");
   const ga4 = sourceAvailability("ga4");
+  const autopilot = input.blogAutopilot || {};
+  const autopilotQueue = asArray(autopilot.candidates).map((item) => ({ id: text(item.id), title: text(item.title), state: text(item.state), eligible: item.eligible === true, reasons: asArray(item.reasons).map(text), plannedSlot: text(item.plannedSlot), evidenceFreshness: text(item.evidenceFreshness), imageStatus: text(item.imageStatus) }));
+  const publicationHistory = asArray(autopilot.publicationHistory).map((item) => ({ id: text(item.id), articleId: text(item.articleId), state: text(item.state), slotKey: text(item.slotKey), completedAt: iso(item.completedAt), publicUrl: text(item.publicUrl), contentFingerprint: text(item.contentFingerprint) }));
   return {
     schemaVersion: seoInterfaceSchemaVersion,
     generatedAt: new Date(options.now || Date.now()).toISOString(),
@@ -196,6 +199,23 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
       executions: executionRows,
       scheduledCadence: ["Monday 08:00 Europe/Amsterdam", "First Monday monthly review via guarded Monday 09:00 schedule"],
       collectionTriggeredByPageLoad: false,
+    },
+    blogAutopilot: {
+      policyId: text(autopilot.policyId || "elvio-blog-autopilot-v1"),
+      mode: text(autopilot.mode || "full_autopilot"),
+      activationState: text(autopilot.activationState || "development_only"),
+      monthlyTargetMaximum: Math.min(2, Math.max(0, number(autopilot.monthlyTargetMaximum || 2))),
+      publishedThisMonth: Math.max(0, number(autopilot.publishedThisMonth)),
+      upcomingSlots: asArray(autopilot.upcomingSlots).slice(0, 2).map((item) => ({ id: text(item.id), localTime: iso(item.localTime), state: text(item.state || "planned") })),
+      candidateQueue: page(autopilotQueue, { limit: 25, max: 50 }),
+      heldCount: autopilotQueue.filter((item) => ["held_for_review", "policy_rejected", "uncertain"].includes(item.state)).length,
+      validationFailureCount: Math.max(0, number(autopilot.validationFailureCount)),
+      wixPublishingStatus: text(autopilot.wixPublishingStatus || "disabled"),
+      publicationHistory: page(publicationHistory, { limit: 25, max: 50 }),
+      latestExecutionStatus: text(autopilot.latestExecutionStatus || "not_activated"),
+      killSwitchActive: autopilot.killSwitchActive !== false,
+      performance: { searchEvidenceAvailable: autopilot.performance?.searchEvidenceAvailable === true, organicAttributionAvailable: autopilot.performance?.organicAttributionAvailable === true, limitation: text(autopilot.performance?.limitation || "Publication and commercial attribution remain unavailable until separately activated and verified.") },
+      readOnly: true,
     },
   };
 }

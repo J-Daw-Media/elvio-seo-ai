@@ -32,7 +32,7 @@ export class WixOneShotExecutor {
       if (!create?.draftPost?.id) throw new Error("WIX_CREATE_RESPONSE_UNCERTAIN");
       record = await this.ledger.transition(fingerprint, record.version, "created", { wixDraftId: create.draftPost.id, createResponseStatus: create.responseStatus || 200 });
       const retrieved = await this.request(`${wixPhase2Contract.draftEndpoint}/${encodeURIComponent(record.wixDraftId)}`, "GET", session.credential, siteId);
-      const verification = verifyRetrievedDraft(retrieved?.draftPost, wixDryRun.payload.draftPost, record.wixDraftId);
+      const verification = verifyRetrievedDraft(retrieved?.draftPost, wixDryRun.payload.draftPost, record.wixDraftId, siteId);
       record = await this.ledger.transition(fingerprint, record.version, "verified", { verifiedAt: this.now(), verification, receipt: redactedReceipt(record, verification) });
       return { status: "verified", postRequests: 1, wixDraftId: record.wixDraftId, receipt: record.receipt };
     } catch (error) {
@@ -63,7 +63,7 @@ export class WixOneShotExecutor {
       session = await this.credentialSession.acquire();
       if (!session?.credential || session.siteId !== siteId) throw new Error("WIX_CREDENTIAL_SITE_MISMATCH");
       const retrieved = await this.request(`${wixPhase2Contract.draftEndpoint}/${encodeURIComponent(wixDraftId)}`, "GET", session.credential, siteId);
-      const verification = verifyRetrievedDraft(retrieved?.draftPost, wixDryRun.payload.draftPost, wixDraftId);
+      const verification = verifyRetrievedDraft(retrieved?.draftPost, wixDryRun.payload.draftPost, wixDraftId, siteId);
       record = await this.ledger.transition(approvedFingerprint, record.version, "verified", { wixDraftId, verifiedAt: this.now(), verification, reconciledWithoutCreate: true, receipt: redactedReceipt({ ...record, wixDraftId }, verification) });
       return { status: "verified", reconciled: true, postRequests: 0, wixDraftId, receipt: record.receipt };
     } finally {
@@ -94,15 +94,49 @@ function verifyCandidate({ review, wixDryRun, approvedFingerprint, siteId }) {
   assertWixEndpointAllowed(wixDryRun.endpoint, "POST");
 }
 
-function verifyRetrievedDraft(actual, expected, expectedId) {
+export function normalizeWixDraft(draft = {}) {
+  const tags = Array.isArray(draft.seoData?.tags) ? draft.seoData.tags : [];
+  const seoTitle = tags.find((tag) => tag.type === "title")?.children ?? null;
+  const seoDescription = tags.find((tag) => tag.type === "meta" && tag.props?.name === "description")?.props?.content ?? null;
+  const nodes = (draft.richContent?.nodes || []).map((node) => ({
+    type: node.type,
+    level: node.headingData?.level ?? null,
+    parts: (node.nodes || []).map((part) => ({ text: part.textData?.text || "", links: (part.textData?.decorations || []).filter((item) => item.type === "LINK").map((item) => item.linkData?.link?.url).filter(Boolean) })),
+  }));
+  const headings = nodes.filter((node) => node.type === "HEADING").map((node) => `${node.level}:${node.parts.map((part) => part.text).join("")}`);
+  const paragraphs = nodes.filter((node) => node.type === "PARAGRAPH").map((node) => node.parts.map((part) => part.text).join(""));
+  const links = nodes.flatMap((node) => node.parts.flatMap((part) => part.links));
+  const canonicalContent = { title: draft.title ?? null, slug: draft.slug ?? null, excerpt: draft.excerpt ?? null, seoTitle, seoDescription, nodes };
+  return {
+    id: draft.id ?? null, siteId: draft.siteId ?? null, title: draft.title ?? null, slug: draft.slug ?? null, excerpt: draft.excerpt ?? null,
+    seoTitle, seoDescription, nodes, headings, paragraphs, links,
+    contentChecksum: sha256(canonicalContent), imageIdentity: draft.media?.wixMedia?.image || null,
+    status: draft.status ?? null, publishedDate: draft.publishedDate ?? null,
+  };
+}
+
+export function verifyRetrievedDraft(actual, expected, expectedId, expectedSiteId = approvedGate4Candidate.siteId) {
   if (!actual || actual.id !== expectedId) throw new Error("WIX_RETRIEVED_DRAFT_ID_MISMATCH");
-  if (actual.title !== expected.title || actual.slug !== expected.slug || actual.excerpt !== expected.excerpt) throw new Error("WIX_RETRIEVED_CONTENT_MISMATCH");
+  const normalizedActual = normalizeWixDraft(actual);
+  const normalizedExpected = normalizeWixDraft(expected);
   if (actual.publishedDate || actual.status && String(actual.status).toUpperCase() !== "DRAFT") throw new Error("WIX_RETRIEVED_DRAFT_PUBLISHED");
-  const expectedHeadings = expected.richContent?.nodes?.filter((node) => node.type === "HEADING").map((node) => `${node.headingData?.level}:${node.nodes?.map((item) => item.textData?.text || "").join("")}`);
-  const actualHeadings = actual.richContent?.nodes?.filter((node) => node.type === "HEADING").map((node) => `${node.headingData?.level}:${node.nodes?.map((item) => item.textData?.text || "").join("")}`);
-  if (JSON.stringify(actualHeadings) !== JSON.stringify(expectedHeadings)) throw new Error("WIX_RETRIEVED_HEADINGS_MISMATCH");
-  if (actual.media?.wixMedia?.image) throw new Error("WIX_RETRIEVED_IMAGE_UNEXPECTED");
-  return { unpublished: true, title: true, slug: true, excerpt: true, headings: true, imageFree: true };
+  for (const field of ["title", "slug", "excerpt", "seoTitle", "seoDescription", "contentChecksum", "imageIdentity"]) {
+    if (normalizedActual[field] !== normalizedExpected[field]) throw new Error(`WIX_RETRIEVED_${field.toUpperCase()}_MISMATCH`);
+  }
+  for (const field of ["headings", "paragraphs", "links", "nodes"]) {
+    if (JSON.stringify(normalizedActual[field]) !== JSON.stringify(normalizedExpected[field])) throw new Error(`WIX_RETRIEVED_${field.toUpperCase()}_MISMATCH`);
+  }
+  const cta = "https://www.djelvio.nl/contact";
+  if (!normalizedActual.links.includes(cta)) throw new Error("WIX_RETRIEVED_CTA_MISMATCH");
+  if (normalizedActual.siteId && normalizedActual.siteId !== expectedSiteId) throw new Error("WIX_RETRIEVED_SITE_ID_MISMATCH");
+  const unverifiableFields = [];
+  if (!normalizedActual.siteId) unverifiableFields.push("wix_site_identity_response_field");
+  return {
+    unpublished: true, title: true, slug: true, seoTitle: true, seoDescription: true, completeBody: true,
+    headings: true, paragraphs: true, internalLinks: true, cta: true, imageIdentity: true,
+    expectedContentChecksum: normalizedExpected.contentChecksum, retrievedContentChecksum: normalizedActual.contentChecksum,
+    requestBoundSiteIdentity: expectedSiteId, unverifiableFields,
+  };
 }
 
 function replayResult(record) {

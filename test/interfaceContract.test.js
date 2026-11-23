@@ -90,4 +90,15 @@ test("collector availability preserves source errors, missing evidence and stale
   assert.equal(inferAvailability([{ generatedAt: "2026-11-01T08:00:00.000Z", sources: [{ source: "ga4", status: "available" }] }], "2026-11-23T16:00:00.000Z").ga4.status, "stale");
 });
 
+test("autopilot monitoring is bounded, read only and inactive by default", () => {
+  const contract = buildSeoInterfaceContract({ blogAutopilot: { candidates: Array.from({ length: 60 }, (_, index) => ({ id: `c${index}`, title: `Candidate ${index}`, state: index ? "policy_rejected" : "eligible_for_autopilot", eligible: index === 0 })), publicationHistory: Array.from({ length: 60 }, (_, index) => ({ id: `p${index}`, articleId: `a${index}`, state: "published_verified" })) } });
+  assert.equal(contract.blogAutopilot.policyId, "elvio-blog-autopilot-v1");
+  assert.equal(contract.blogAutopilot.activationState, "development_only");
+  assert.equal(contract.blogAutopilot.wixPublishingStatus, "disabled");
+  assert.equal(contract.blogAutopilot.killSwitchActive, true);
+  assert.equal(contract.blogAutopilot.readOnly, true);
+  assert.equal(contract.blogAutopilot.candidateQueue.items.length, 25);
+  assert.equal(contract.blogAutopilot.publicationHistory.items.length, 25);
+});
+
 
