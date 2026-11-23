@@ -1,8 +1,9 @@
 import { productionActivationState } from "../src/blogAutopilotRuntime.js";
 import { validateAssetRegistry } from "../src/creativeStudioRegistry.js";
+import { loadBundledCreativeStudioRegistry } from "../src/creativeStudioProduction.js";
 
 const state = productionActivationState();
-const assets = validateAssetRegistry([]);
+const assets = validateAssetRegistry(loadBundledCreativeStudioRegistry());
 const report = {
   schemaVersion: "elvio-blog-autopilot-readiness-v1",
   checkedAt: new Date().toISOString(),

@@ -11,6 +11,7 @@ import { metadataAccessToken } from "./googleAuth.js";
 import { auditSite } from "./technicalAudit.js";
 import { prepareDerivedRecords, persistDerivedRecords } from "./derivedMemory.js";
 import { ApprovedAttributionReadClient, readAttributionSources, prepareAttributionActivation, persistAttributionActivation } from "./attributionActivation.js";
+import { loadBundledCreativeStudioRegistry, verifyCreativeStudioProductionAccess } from "./creativeStudioProduction.js";
 
 function amsterdamDate(offsetDays = 0, now = new Date()) {
   const base = new Date(now.getTime() + offsetDays * 86400000);
@@ -122,6 +123,13 @@ export async function runProductionDryRun({
       writesPerformed: 0, externalSourceWritesPerformed: 0,
     } : { enabled: false, mode: "disabled", writesPerformed: 0, externalSourceWritesPerformed: 0 },
   };
+  const creativeStudioRecords = loadBundledCreativeStudioRegistry();
+  summary.creativeStudio = await verifyCreativeStudioProductionAccess({
+    records: creativeStudioRecords,
+    bucket: process.env.CREATIVE_STUDIO_BUCKET,
+    objectPrefix: process.env.CREATIVE_STUDIO_OBJECT_PREFIX,
+    accessToken: process.env.CREATIVE_STUDIO_BUCKET ? await getCloudToken() : null,
+  });
   if (state.persistentWritesEnabled && !state.dryRun) {
     const cloudToken = await getCloudToken();
     const projectId = process.env.GOOGLE_CLOUD_PROJECT || "crm2026-497707";

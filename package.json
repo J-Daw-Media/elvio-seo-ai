@@ -9,6 +9,8 @@
     "gate4:dry-run": "node scripts/gate4-dry-run.js",
     "gate4g:rehearse": "node scripts/gate4g-synthetic-rehearsal.js",
     "gate4g:execute": "node scripts/gate4g-production-one-shot.js",
-    "blog-autopilot:readiness": "node scripts/blog-autopilot-readiness.js"
+    "blog-autopilot:readiness": "node scripts/blog-autopilot-readiness.js",
+    "milestone-b:creative-rehearsal": "node scripts/milestone-b-creative-rehearsal.js",
+    "milestone-b:first-publication-package": "node scripts/first-publication-package.js"
   }
 }

@@ -4,6 +4,7 @@ export const blogAutopilotPolicyV1 = Object.freeze({
   activationState: "development_only",
   timezone: "Europe/Amsterdam",
   monthlyPublicationLimit: 6,
+  exploratoryPublicationLimit: 2,
   slots: Object.freeze([
     { id: "day-03", dayOfMonth: 3, hour: 10, minute: 0 },
     { id: "day-08", dayOfMonth: 8, hour: 10, minute: 0 },
