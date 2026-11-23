@@ -12,7 +12,9 @@ export async function executeAuthorizedWixDraft({ store, authorization, parentAt
   try {
     return await executor.execute(preparedInput);
   } finally {
-    const revoked = Boolean(credentialSession?.lastSession && await credentialSession.isRevoked(credentialSession.lastSession));
-    if (await store.getAttempt(authorization.attemptId)) await store.markCredentialRevoked(authorization.attemptId, revoked);
+    if (credentialSession?.lastSession && await store.getAttempt(authorization.attemptId)) {
+      const revoked = Boolean(await credentialSession.isRevoked(credentialSession.lastSession));
+      await store.markCredentialRevoked(authorization.attemptId, revoked);
+    }
   }
 }
