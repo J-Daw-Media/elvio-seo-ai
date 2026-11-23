@@ -46,7 +46,7 @@ function successfulFetch(payload, calls) {
   return async (url, options) => {
     calls.push({ url, method: options.method, body: options.body, headers: options.headers });
     if (options.method === "POST") return response(200, { draftPost: { id: "wix-draft-123" } });
-    return response(200, { draftPost: { id: "wix-draft-123", status: "DRAFT", ...payload.draftPost } });
+    return response(200, { draftPost: { id: "wix-draft-123", status: "UNPUBLISHED", ...payload.draftPost, media: { displayed: true, custom: false } } });
   };
 }
 
@@ -56,7 +56,7 @@ test("one-shot executor creates exactly once, retrieves exact ID and records ver
   const result = await executor.execute(input);
   assert.equal(result.status, "verified"); assert.equal(result.postRequests, 1); assert.equal(result.wixDraftId, "wix-draft-123");
   assert.deepEqual(calls.map((item) => item.method), ["POST", "GET"]);
-  assert.match(calls[1].url, /draft-posts\/wix-draft-123$/);
+  assert.match(calls[1].url, /draft-posts\/wix-draft-123\?fieldsets=RICH_CONTENT$/);
   assert.equal(JSON.parse(calls[0].body).publish, false);
   assert.equal(credentials.revoked, true);
   const stored = await ledger.get(input.approvedFingerprint);
@@ -87,6 +87,8 @@ test("changed fingerprint, site mismatch, missing approval, image and publicatio
     (x) => { x.review.state = "owner_review"; },
     (x) => { x.wixDryRun.payload.publish = true; },
     (x) => { x.wixDryRun.payload.draftPost.media = { wixMedia: { image: "x" } }; },
+    (x) => { delete x.wixDryRun.payload.draftPost.memberId; },
+    (x) => { x.wixDryRun.payload.draftPost.slug = x.wixDryRun.payload.draftPost.seoSlug; delete x.wixDryRun.payload.draftPost.seoSlug; },
   ]) {
     const input = prepared(); mutate(input); const ledger = new SyntheticLedger();
     await assert.rejects(() => new WixOneShotExecutor({ ledger, credentialSession: new SyntheticCredentialSession(), fetchImpl: async () => { throw new Error("should not run"); } }).execute(input));
@@ -165,6 +167,16 @@ test("published, changed content, changed headings and unexpected image all fail
     await assert.rejects(() => executor.execute(input));
     assert.equal((await ledger.get(input.approvedFingerprint)).state, "uncertain");
   }
+});
+
+test("live Wix response shape accepts UNPUBLISHED and an empty media shell", async () => {
+  const input = prepared(); const ledger = new SyntheticLedger(); const calls = [];
+  const executor = new WixOneShotExecutor({ ledger, credentialSession: new SyntheticCredentialSession(), fetchImpl: successfulFetch(input.wixDryRun.payload, calls) });
+  const result = await executor.execute(input);
+  assert.equal(result.status, "verified");
+  assert.equal(result.receipt.verification.unpublished, true);
+  assert.equal(result.receipt.verification.imageIdentity, true);
+  assert.equal(result.receipt.verification.seoSlug, true);
 });
 
 test("credential site mismatch fails before request and revocation failure is explicit", async () => {

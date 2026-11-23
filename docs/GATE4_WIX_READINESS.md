@@ -42,10 +42,10 @@ Any editorial change produces a different fingerprint and invalidates approval f
 1. Owner approves the exact candidate, site ID, fingerprint, image decision, and the unavoidable `Manage Blog` permission risk.
 2. Create a temporary DJ-Elvio-only Wix API key restricted to the single target site and required Blog permissions. Record its identifier, not its value.
 3. Store it as a new Google Secret Manager version available only to a one-shot service identity. Do not bind it to the recurring SEO job or Marketing frontend.
-4. Before execution, retrieve/query existing drafts through the approved read operation and abort on the same fingerprint, title, slug, or unresolved near-duplicate.
+4. Before execution, retrieve/query existing drafts through the approved read operation and abort on the same fingerprint, title, SEO slug, or unresolved near-duplicate.
 5. Verify the approved fingerprint again, verify `publish: false`, and verify the outbound request matches the exact create endpoint.
 6. Execute exactly one create request. Persist the returned Wix draft ID atomically against the fingerprint before any further action.
-7. Retrieve that exact ID with the allowed get-by-ID operation. Compare title, slug, excerpt, SEO metadata, H1/H2 sequence, body text, internal link, image state, and unpublished state.
+7. Retrieve that exact ID with the `RICH_CONTENT` fieldset. Compare title, `seoSlug`, excerpt, SEO metadata, H1/H2 sequence, body text, internal link, image state, writer identity, and unpublished state (`UNPUBLISHED` or the legacy `DRAFT` response value).
 8. Repeat the preparation step and prove that the stored fingerprint-to-Wix-ID mapping prevents a second create call.
 9. Revoke the temporary Wix API key and disable/destroy its secret version immediately after verification. Confirm the recurring SEO job never received the secret.
 10. If verification fails, do not publish or retry creation. Preserve audit evidence. Removal of the newly created unpublished draft is a separate destructive action requiring explicit approval; otherwise leave it unpublished for manual inspection.
@@ -102,7 +102,7 @@ The approved fingerprint and DJ Elvio Wix site ID are fixed in the executor. The
 - **Credential expiration:** if it occurs before POST, fail before request; if a request may have started, quarantine.
 - **Credential revocation failure:** report the security incident and do not declare Gate 4 complete, even if the draft was verified.
 
-Reconciliation never performs a POST. It accepts only the approved fingerprint, the fixed site ID, and an exact Wix-assigned draft ID, then performs one permitted GET and validates title, slug, SEO description, heading structure, image-free state, and unpublished status.
+Reconciliation never performs a POST. It accepts only the approved fingerprint, the fixed site ID, and an exact Wix-assigned draft ID, then performs one permitted GET and validates title, SEO slug, SEO description, heading structure, image-free state, writer identity, and unpublished status.
 
 ### Live-test prerequisites
 
@@ -111,7 +111,7 @@ Reconciliation never performs a POST. It accepts only the approved fingerprint, 
 3. Create a temporary site-restricted Wix credential and a dedicated one-shot service identity.
 4. Grant that identity access only to the temporary Secret Manager version and the `seo_wix_draft_executions` ledger collection.
 5. Verify the recurring SEO job service account has no access to the Wix secret.
-6. Inspect Wix for an existing matching slug before execution.
+6. Inspect Wix for an existing matching SEO slug before execution.
 7. Run the isolated executor once; never invoke it from a schedule.
 8. Verify the returned draft by exact ID and execute the zero-POST replay check.
 9. Revoke the Wix key, disable the secret version, and independently verify both actions.
