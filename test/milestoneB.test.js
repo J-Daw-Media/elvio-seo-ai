@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { generateArticle } from "../src/autopilotGeneration.js";
 import { selectApprovedAsset, validateAssetRegistry, validateCreativeAsset } from "../src/creativeStudioRegistry.js";
 import { uploadVerifiedImage } from "../src/wixMedia.js";
@@ -47,6 +48,18 @@ test("registry rejects duplicate Drive identities and checksums", () => {
   assert.equal(report.valid, false);
   assert.deepEqual(report.duplicateDriveIds, ["same"]);
   assert.deepEqual(report.duplicateChecksums, ["same-checksum"]);
+});
+
+test("owner-approved Pexels detail library is valid, unique and topic-selectable", () => {
+  const records = JSON.parse(fs.readFileSync(new URL("../docs/creative-studio-approved-assets-2026-11-23.json", import.meta.url), "utf8"));
+  const report = validateAssetRegistry(records);
+  assert.equal(records.length, 12);
+  assert.equal(report.valid, true);
+  assert.equal(report.usable, 12);
+  assert.deepEqual(report.duplicateDriveIds, []);
+  assert.deepEqual(report.duplicateChecksums, []);
+  assert.equal(selectApprovedAsset(records, { topicTags: ["wedding", "table-decoration"] }).asset.categories.includes("wedding"), true);
+  assert.equal(selectApprovedAsset(records, { topicTags: ["dj-equipment", "mixer"] }).asset.categories.includes("equipment"), true);
 });
 
 test("Wix media uses only generated signed upload and verifies READY", async () => {

@@ -1,10 +1,14 @@
 {
   "schemaVersion": "creative-studio-owner-review-v1",
-  "preparedAt": "2026-11-23T21:00:00+01:00",
-  "writesPerformed": 0,
-  "approvedAssetsRegistered": 0,
+  "preparedAt": "2026-11-23T22:30:00+01:00",
+  "writesPerformed": 13,
+  "approvedAssetsRegistered": 12,
   "sourceFolderId": "1qLKU8jrQd5be1YpeRTwqJv_ZvnCbDjEr",
-  "decisionRequired": "Owner must choose assets and confirm publication rights and privacy basis before registration.",
+  "decisionRequired": "Completed for the Pexels detail library. Publication and Wix upload remain separately gated.",
+  "approvedRegistryFile": "docs/creative-studio-approved-assets-2026-11-23.json",
+  "approvedRegistryDriveFileId": "1etLm96nNw7uVDEGspbllz0JxjyEw7USK",
+  "approvedAssetsFolderId": "1gSm9jg4aa8ycIJlV4DxrcoubpSFlm6N2",
+  "assetRegistryFolderId": "1hGhCu5SznTVw9NURPeP8BQMucQSk9YNe",
   "localCandidates": [
     { "assetId": "dj-elvio-gig-01", "driveFileId": "11V1QRUt9DJE3DC7qOWw9UEz14FpZSrQ0", "fileName": "01.jpg", "width": 6000, "height": 4500, "mimeType": "image/jpeg", "checksum": "53796992dfb21811e630041253e37cb24e2aaa9d9de9b2cb5c986feb0b5ca332", "categories": ["corporate", "drive-in"], "topics": ["dj-equipment", "complete-drive-in", "event-preparation"], "visualSuitability": "strong_horizontal_booth_led_header", "provenance": "DJ Elvio Gig Photos source folder", "rightsStatus": "owner_confirmation_required", "privacyStatus": "recognizable_guests_review_required", "altTextNl": "DJ-booth in een ruime evenementenlocatie met feestverlichting", "status": "pending_owner_approval" },
     { "assetId": "dj-elvio-gig-48", "driveFileId": "1Ux3OPTLEy4iCHu7Z-qjMtz-I0xttSDDc", "fileName": "48.jpg", "width": 3375, "height": 4500, "mimeType": "image/jpeg", "checksum": "cd3da86f53e9ae30a90c97e0fae34113466f45fd53171afa7116d8bfc5dfb629", "categories": ["party", "equipment"], "topics": ["lighting", "dj-equipment"], "visualSuitability": "detail_image_portrait_crop_required", "provenance": "DJ Elvio Gig Photos source folder", "rightsStatus": "owner_confirmation_required", "privacyStatus": "manual_full_resolution_check_required", "altTextNl": "Detail van DJ-apparatuur in gekleurde feestverlichting", "status": "pending_owner_approval" },
@@ -19,7 +23,7 @@
     { "assetId": "dj-elvio-gig-170", "driveFileId": "1DpyweaN1Spd1uJ6Px1wStLz9spB-xgCT", "fileName": "170.jpg", "width": 4032, "height": 3024, "mimeType": "image/jpeg", "checksum": "18e10da8b27ed19df5cdc20d0ecf4497a06bf4ed9bd4d504bacce9ceed8ef7d9", "categories": ["private-party"], "topics": ["dancefloor-atmosphere"], "visualSuitability": "horizontal_party_header", "provenance": "DJ Elvio Gig Photos source folder", "rightsStatus": "owner_confirmation_required", "privacyStatus": "multiple_recognizable_guests", "altTextNl": "Dansvloer met gasten onder groene feestverlichting", "status": "pending_owner_approval" },
     { "assetId": "dj-elvio-gig-171", "driveFileId": "1QO0TzVIN1XLOu8VXMV72sdXr4iL3aI1t", "fileName": "171.jpg", "width": 6000, "height": 4500, "mimeType": "image/jpeg", "checksum": "47a210b73f952221fa84be5b9a482c97b391f2e4667022b41754225549167be5", "categories": ["corporate", "private-party"], "topics": ["event-atmosphere", "venue-layout"], "visualSuitability": "strong_horizontal_room_view", "provenance": "DJ Elvio Gig Photos source folder", "rightsStatus": "owner_confirmation_required", "privacyStatus": "multiple_recognizable_guests", "altTextNl": "Sfeervolle evenementenruimte met gasten en feestverlichting", "status": "pending_owner_approval" }
   ],
-  "pexelsDetailCandidates": [
+  "initialPexelsShortlist": [
     { "externalId": "pexels-34307990", "pageUrl": "https://www.pexels.com/photo/close-up-of-modern-dj-mixer-with-vibrant-lights-34307990/", "photographer": "Novkov Visuals", "width": 2650, "height": 1769, "mimeType": "image/jpeg", "visualSuitability": "people_free_horizontal_dj_detail", "license": "Pexels License", "rightsStatus": "licensed_stock_page_verified_download_not_registered", "privacyStatus": "no_identifiable_person_observed", "altTextNl": "Close-up van een DJ-mengpaneel met kleurrijke verlichting", "status": "pending_owner_approval" },
     { "externalId": "pexels-9271243", "pageUrl": "https://www.pexels.com/photo/close-up-of-a-dj-mixer-9271243/", "photographer": "Erik Mclean", "width": 5472, "height": 3648, "mimeType": "image/jpeg", "visualSuitability": "people_free_horizontal_dj_detail", "license": "Pexels License", "rightsStatus": "licensed_stock_page_verified_download_not_registered", "privacyStatus": "no_identifiable_person_observed", "altTextNl": "DJ-mixer met gekleurde lampen in een donkere feestruimte", "status": "pending_owner_approval" },
     { "externalId": "pexels-10097579", "pageUrl": "https://www.pexels.com/photo/dj-using-a-dj-mixer-10097579/", "photographer": "Alexander Nadrilyanski", "width": 6048, "height": 4024, "mimeType": "image/jpeg", "visualSuitability": "horizontal_hands_and_equipment_detail", "license": "Pexels License", "rightsStatus": "licensed_stock_page_verified_download_not_registered", "privacyStatus": "manual_person_and_brand_check_required", "altTextNl": "DJ bedient een mengpaneel onder kleurrijke verlichting", "status": "pending_owner_approval" },

@@ -1,12 +1,20 @@
 # ELVIO SEO AI — Creative Studio Activation & First Publication Readiness Report
 
 Prepared: 23 November 2026 (Europe/Amsterdam)  
-Scope: development, read-only asset review and synthetic testing  
-Production mutations: none
+Scope: development, approved-stock registration and synthetic testing
+Production mutations: 12 approved Drive asset uploads plus one registry artifact; no Wix or website mutation
 
 ## Executive result
 
-**PARTIAL / NO-GO for public publication.** The Creative Studio contract is now stricter, deterministic and tested. A 16-item review package is ready: 12 active DJ Elvio Drive candidates and four Pexels detail-image candidates. No asset is approved or registered because the required owner rights/privacy decision has not occurred. The international-wedding article remains editorially ready but its separate first-party SEO demand is still unproven. The publishing kill switch remains active.
+**PARTIAL / NO-GO for public publication.** The Creative Studio contract is stricter, deterministic and tested. The owner authorized independent selection of people-free Pexels detail images. Twelve clean equipment, lighting and event-decor images are now stored in the dedicated Approved Assets folder and recorded in an immutable registry. Two candidates were rejected before registration: one for prominent third-party branding and one for visible named place cards. The international-wedding article remains editorially ready but its separate first-party SEO demand is still unproven. The publishing kill switch remains active.
+
+## Owner-approved stock library update
+
+- Approved assets: **12** (six equipment/lighting details and six decor/atmosphere details).
+- Registered file: `docs/creative-studio-approved-assets-2026-11-23.json`.
+- Every record includes the Pexels source page, photographer, licence reference, SHA-256 checksum, Dutch alt text, Drive identity and owner-approval reference.
+- Stock images are labelled as generic illustrative material and must never be represented as photographs of actual DJ Elvio events.
+- No image was uploaded to Wix and no page, draft or public article was modified.
 
 ## 1. Source image inventory
 
@@ -18,8 +26,8 @@ Production mutations: none
 | Foto Gallery Website w_logo / Horizontal | 51 JPEG listings | At least one promising file (`14.jpg`) is in Drive Trash; listed presence alone is not proof of availability. |
 | Foto Gallery Website w_logo / Vertical | 14 JPEG listings | Portrait orientation limits header suitability. |
 | Foto Gallery Website w_logo / PNG | 16 PNG listings | Technically compatible, but each file still needs active-file and rights verification. |
-| Approved Assets | 0 | Deliberately unchanged. |
-| Asset Registry | 0 | Deliberately unchanged. |
+| Approved Assets | 12 | Owner-approved, people-free Pexels detail images. |
+| Asset Registry | 1 JSON artifact | Twelve validated immutable records. |
 
 ## 2. Candidate shortlist and image-review package
 
@@ -29,11 +37,11 @@ The machine-readable review package is `docs/milestone-b-creative-studio-review.
 
 Twelve candidates were checked for active Drive identity, dimensions, JPEG format and SHA-256 checksum. The best equipment-led candidates are `01.jpg`, `48.jpg` and `147.jpg`. The remaining candidates show strong event atmosphere but contain recognizable guests or performers. All twelve remain `pending_owner_approval` and `owner_confirmation_required`.
 
-### Pexels detail-image candidates
+### Pexels detail-image library
 
-Four Pexels detail images were added as external candidates. The strongest default is **Pexels 34307990**, a horizontal 2650×1769 close-up of a DJ mixer with no identifiable person observed. It avoids presenting clients as marketing subjects and avoids claiming that the scene is a DJ Elvio booking.
+Twelve Pexels detail images were selected and registered after full visual review. The library balances DJ mixers, audio equipment, microphone, speaker, stage lighting, disco decor, flowers, candles and table settings. The strongest default equipment image remains **Pexels 34307990**, a horizontal 2650×1769 close-up of a DJ mixer with no identifiable person observed.
 
-Pexels allows commercial website/blog use under its licence, but the registry preserves the photographer, source page and licence reference. Images with people, logos or brands still require a separate third-party-rights check. No Pexels file has been downloaded into Approved Assets or registered.
+Pexels allows commercial website/blog use under its licence, and the registry preserves the photographer, source page and licence reference. Candidates with prominent brands or personal information were excluded. All 12 selected files are in Approved Assets and registered; none has been sent to Wix.
 
 ## 3. Rights and provenance assessment
 
@@ -46,7 +54,7 @@ Pexels allows commercial website/blog use under its licence, but the registry pr
 
 ## 4. Approved-assets registry status
 
-**Empty by design.** Zero files were copied to Approved Assets and zero registry records were written. Owner approval is a genuine remaining gate, not a technical placeholder.
+**Active for internal selection.** Twelve approved records pass the registry validator with no duplicate Drive IDs or checksums. This enables deterministic internal image selection but does not authorize Wix upload or publication.
 
 ## 5. Wix media compatibility
 
@@ -69,7 +77,7 @@ Pexels allows commercial website/blog use under its licence, but the registry pr
 - Editorial state: ready for owner review
 - SEO evidence: pending first-party evidence
 - Cannibalization: editorial angle appears distinct, but separate query demand is unproven
-- Suggested image: Pexels 34307990, pending owner selection, download verification and registry creation
+- Suggested image: Pexels 34307990, registered and available for a separately approved Wix upload trial
 
 ## 7. Full article and metadata
 
@@ -144,21 +152,16 @@ The new `milestone-b:creative-rehearsal` command covers all 15 required stages u
 - Recurring publication schedule: not created
 - Kill switch: active
 - Wix image upload: not performed
-- Approved Assets writes: 0
-- Asset Registry writes: 0
+- Approved Assets writes: 12
+- Asset Registry writes: 1
 - CRM/Ads/customer communication changes: 0
 - Existing unpublished Wix draft: unchanged
 
 ## 11. Remaining owner approvals
 
-One consolidated decision is required:
-
-1. Choose the preferred image source for the first article: Pexels detail image or a specified DJ Elvio photo.
-2. For any DJ Elvio photo, confirm copyright/source authority and the privacy/publication basis for recognizable people.
-3. Approve the exact selected image and Dutch alt text.
-4. Separately approve a publication candidate only after first-party SEO evidence supports it.
+The stock-library selection decision is complete. Separate approval is still required for any Wix upload or publication candidate. DJ Elvio event photos remain excluded until copyright/source authority and the privacy basis for recognizable people are confirmed.
 
 ## 12. Exact next controlled step
 
-After the owner approves one image, import exactly that file into Approved Assets, calculate its final checksum, create one immutable registry record, bind its asset identity and checksum to a newly approved article fingerprint, run the synthetic checks again, and prepare—but do not execute—the controlled Wix image upload/publication trial. Public publication still requires a separate explicit approval.
+Select one registered asset for a specific article, bind its asset ID and checksum to a newly approved article fingerprint, run the synthetic checks again, and prepare—but do not execute—the controlled Wix image upload/publication trial. Public publication still requires separate explicit approval.
 
