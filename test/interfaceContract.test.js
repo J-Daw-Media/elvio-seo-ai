@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildSeoInterfaceContract, freshness, seoInterfaceSchemaVersion } from "../src/interfaceContract.js";
-import { SeoInterfaceReadModel } from "../src/interfaceReadModel.js";
+import { SeoInterfaceReadModel, inferAvailability } from "../src/interfaceReadModel.js";
 
 const input = {
   opportunities: [{ id: "o1", topic: "DJ huren", score: 86, dimensions: { searchIntent: 90, commercialRelevance: 88 }, evidenceLimited: false }],
@@ -52,6 +52,31 @@ test("read model uses only the approved bounded collections", async () => {
   assert.equal(result.readOnly, true);
   assert.equal(calls.length, 9);
   assert.ok(calls.every(([, options]) => options.limit === 100));
+});
+
+test("collector availability adapts persisted source arrays without rewriting history", () => {
+  const availability = inferAvailability([{
+    generatedAt: "2026-11-23T14:59:33.000Z",
+    sources: [
+      { source: "google_search_console", status: "available", rows: 286 },
+      { source: "ga4", status: "available", rows: 14 },
+    ],
+  }], "2026-11-23T16:00:00.000Z");
+  assert.deepEqual(availability.searchConsole, { status: "available", lastAttemptAt: "2026-11-23T14:59:33.000Z", lastSuccessfulAt: "2026-11-23T14:59:33.000Z", reason: null });
+  assert.deepEqual(availability.ga4, { status: "available", lastAttemptAt: "2026-11-23T14:59:33.000Z", lastSuccessfulAt: "2026-11-23T14:59:33.000Z", reason: null });
+});
+
+test("collector availability preserves source errors, missing evidence and stale success", () => {
+  const availability = inferAvailability([
+    { generatedAt: "2026-11-23T14:00:00.000Z", sources: [{ source: "ga4", status: "unavailable", reason: "quota_exhausted" }] },
+    { generatedAt: "2026-11-01T08:00:00.000Z", sources: [{ source: "ga4", status: "available" }] },
+  ], "2026-11-23T16:00:00.000Z");
+  assert.equal(availability.searchConsole.status, "unknown");
+  assert.equal(availability.searchConsole.reason, "collector_evidence_missing");
+  assert.equal(availability.ga4.status, "unavailable");
+  assert.equal(availability.ga4.reason, "quota_exhausted");
+  assert.equal(availability.ga4.lastSuccessfulAt, "2026-11-01T08:00:00.000Z");
+  assert.equal(inferAvailability([{ generatedAt: "2026-11-01T08:00:00.000Z", sources: [{ source: "ga4", status: "available" }] }], "2026-11-23T16:00:00.000Z").ga4.status, "stale");
 });
 
 
