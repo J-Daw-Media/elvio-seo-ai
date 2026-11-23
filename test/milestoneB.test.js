@@ -1,11 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { generateArticle } from "../src/autopilotGeneration.js";
-import { selectApprovedAsset, validateAssetRegistry } from "../src/creativeStudioRegistry.js";
+import { selectApprovedAsset, validateAssetRegistry, validateCreativeAsset } from "../src/creativeStudioRegistry.js";
 import { uploadVerifiedImage } from "../src/wixMedia.js";
 import { publishVerifiedDraft } from "../src/blogPublicationTransport.js";
 import { prepareAutopilotCandidate, productionActivationState } from "../src/blogAutopilotRuntime.js";
 import { verifyPublicArticle } from "../src/publicPageVerification.js";
+import { runMilestoneBCreativeRehearsal } from "../src/milestoneBCreativeRehearsal.js";
 
 const goodArticle = { title: "Titel", h1: "Titel", seoTitle: "SEO titel", seoDescription: "Beschrijving", excerpt: "Samenvatting", sections: [{}, {}, {}], ctaUrl: "https://www.djelvio.nl/contact", evidenceRefs: ["e1"], unsupportedClaims: [] };
 
@@ -16,13 +17,36 @@ test("generation retries once and remains evidence bound", async () => {
 });
 
 test("empty Creative Studio registry blocks image selection", () => {
-  assert.deepEqual(validateAssetRegistry([]), { usable: 0, total: 0, empty: true });
+  assert.deepEqual(validateAssetRegistry([]), { usable: 0, total: 0, empty: true, valid: true, duplicateDriveIds: [], duplicateChecksums: [], entries: [] });
   assert.equal(selectApprovedAsset([]).reason, "approved_asset_unavailable");
 });
 
 test("asset selection requires rights and provenance", () => {
-  const result = selectApprovedAsset([{ driveFileId: "a", status: "approved", rightsVerified: true, provenance: "owned", mimeType: "image/jpeg", tags: ["wedding"] }], { topicTags: ["wedding"] });
+  const result = selectApprovedAsset([{ assetId: "asset-1", driveFileId: "a", sourceFolderId: "folder", fileName: "a.jpg", status: "approved", rightsVerified: true, privacyStatus: "cleared", provenance: "owned", mimeType: "image/jpeg", width: 1600, height: 900, checksum: "abc", altText: "DJ booth", active: true, tags: ["wedding"], ownerApproval: { approvedAt: "2026-11-23T00:00:00Z", approvalRef: "owner-review-1" } }], { topicTags: ["wedding"] });
   assert.equal(result.available, true); assert.equal(result.asset.driveFileId, "a");
+});
+
+test("pending owner approval and uncleared privacy remain non-selectable", () => {
+  const base = { assetId: "asset-2", driveFileId: "b", sourceFolderId: "folder", fileName: "b.jpg", status: "pending_owner_approval", rightsVerified: false, privacyStatus: "review_required", provenance: "source_folder_inventory", mimeType: "image/jpeg", width: 1200, height: 800, checksum: "def", altText: "Dansvloer", active: true };
+  assert.equal(validateCreativeAsset(base).valid, true);
+  assert.equal(selectApprovedAsset([base]).available, false);
+});
+
+test("approved records fail closed without privacy, owner approval, checksum or active file", () => {
+  const result = validateCreativeAsset({ assetId: "asset-3", driveFileId: "c", sourceFolderId: "folder", fileName: "c.jpg", status: "approved", rightsVerified: true, provenance: "owned", mimeType: "image/jpeg", width: 1200, height: 800, altText: "DJ", privacyStatus: "review_required", active: false });
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.includes("checksum_required"));
+  assert.ok(result.errors.includes("privacy_not_cleared"));
+  assert.ok(result.errors.includes("owner_approval_required"));
+  assert.ok(result.errors.includes("asset_not_active"));
+});
+
+test("registry rejects duplicate Drive identities and checksums", () => {
+  const base = { assetId: "asset-4", driveFileId: "same", sourceFolderId: "folder", fileName: "a.jpg", status: "candidate", provenance: "inventory", mimeType: "image/jpeg", width: 1200, height: 800, checksum: "same-checksum", altText: "DJ setup" };
+  const report = validateAssetRegistry([base, { ...base, assetId: "asset-5", fileName: "b.jpg" }]);
+  assert.equal(report.valid, false);
+  assert.deepEqual(report.duplicateDriveIds, ["same"]);
+  assert.deepEqual(report.duplicateChecksums, ["same-checksum"]);
 });
 
 test("Wix media uses only generated signed upload and verifies READY", async () => {
@@ -49,4 +73,12 @@ test("public page verification checks canonical metadata CTA image and indexabil
   const html = '<html><head><title>SEO</title><link rel="canonical" href="https://www.djelvio.nl/blog/x"></head><body><h1>H1</h1><a href="https://www.djelvio.nl/contact">Contact</a><img src="image1"></body></html>';
   const result = await verifyPublicArticle({ url: "https://www.djelvio.nl/blog/x", expected: { seoTitle: "SEO", canonicalUrl: "https://www.djelvio.nl/blog/x", h1: "H1", ctaUrl: "https://www.djelvio.nl/contact", imageIdentity: "image1" }, fetchImpl: async () => ({ ok: true, url: "https://www.djelvio.nl/blog/x", text: async () => html }) });
   assert.equal(result.verified, true);
+});
+
+test("Milestone B rehearsal covers all fifteen stages without external activity", () => {
+  const result = runMilestoneBCreativeRehearsal();
+  assert.equal(result.steps.length, 15);
+  assert.equal(result.passed, true);
+  assert.equal(result.externalWrites, 0);
+  assert.equal(result.externalRequests, 0);
 });
