@@ -94,6 +94,8 @@ test("autopilot monitoring is bounded, read only and inactive by default", () =>
   const contract = buildSeoInterfaceContract({ blogAutopilot: { candidates: Array.from({ length: 60 }, (_, index) => ({ id: `c${index}`, title: `Candidate ${index}`, state: index ? "policy_rejected" : "eligible_for_autopilot", eligible: index === 0 })), publicationHistory: Array.from({ length: 60 }, (_, index) => ({ id: `p${index}`, articleId: `a${index}`, state: "published_verified" })) } });
   assert.equal(contract.blogAutopilot.policyId, "elvio-blog-autopilot-v1");
   assert.equal(contract.blogAutopilot.activationState, "development_only");
+  assert.equal(contract.blogAutopilot.monthlyTargetMaximum, 6);
+  assert.equal(contract.blogAutopilot.remainingMonthlyCapacity, 6);
   assert.equal(contract.blogAutopilot.wixPublishingStatus, "disabled");
   assert.equal(contract.blogAutopilot.killSwitchActive, true);
   assert.equal(contract.blogAutopilot.readOnly, true);

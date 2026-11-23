@@ -21,9 +21,10 @@ function candidate(overrides = {}) {
   };
 }
 
-test("autopilot policy is versioned, capped at two and inactive by default", () => {
+test("autopilot policy is versioned, capped at six and inactive by default", () => {
   assert.equal(blogAutopilotPolicyV1.id, "elvio-blog-autopilot-v1");
-  assert.equal(blogAutopilotPolicyV1.monthlyPublicationLimit, 2);
+  assert.equal(blogAutopilotPolicyV1.monthlyPublicationLimit, 6);
+  assert.equal(blogAutopilotPolicyV1.slots.length, 6);
   assert.equal(blogAutopilotPolicyV1.activationState, "development_only");
   assert.equal(publicationExecutorContract.productionRequestEnabled, false);
 });
@@ -35,8 +36,8 @@ test("topic selection ranks supported opportunities and never fabricates quota f
     { ...base, id: "b", topic: "Bedrijfsfeest muziek", opportunityScore: 80 },
     { ...base, id: "c", topic: "Zwak onderwerp", opportunityScore: 99, evidenceStrength: "limited" },
   ] });
-  assert.deepEqual(result.selected.map((item) => item.id), ["a", "b"]); assert.equal(result.rejected[0].id, "c"); assert.equal(result.unfilledCapacity, 0);
-  const empty = selectAutopilotTopics({ now: new Date("2026-11-23T10:00:00Z"), opportunities: [] }); assert.equal(empty.selected.length, 0); assert.equal(empty.unfilledCapacity, 2);
+  assert.deepEqual(result.selected.map((item) => item.id), ["a", "b"]); assert.equal(result.rejected[0].id, "c"); assert.equal(result.unfilledCapacity, 4);
+  const empty = selectAutopilotTopics({ now: new Date("2026-11-23T10:00:00Z"), opportunities: [] }); assert.equal(empty.selected.length, 0); assert.equal(empty.unfilledCapacity, 6);
 });
 
 test("topic selection rejects published duplicates, cannibalization and better existing-page targets", () => {
@@ -49,29 +50,43 @@ test("topic selection rejects published duplicates, cannibalization and better e
   assert.equal(result.selected.length, 0); assert.equal(result.rejected.length, 3);
 });
 
-test("second and fourth Wednesday slots use Amsterdam local time across DST", () => {
-  assert.equal(publicationSlotAt("2026-03-11T09:05:00.000Z")?.key, "2026-03:second-wednesday");
-  assert.equal(publicationSlotAt("2026-10-14T08:05:00.000Z")?.key, "2026-10:second-wednesday");
-  assert.equal(publicationSlotAt("2026-10-28T09:05:00.000Z")?.key, "2026-10:fourth-wednesday");
+test("six fixed day slots use Amsterdam local time across DST", () => {
+  assert.deepEqual(blogAutopilotPolicyV1.slots.map((slot) => slot.dayOfMonth), [3, 8, 13, 18, 23, 28]);
+  assert.equal(publicationSlotAt("2026-03-28T09:05:00.000Z")?.key, "2026-03:day-28");
+  assert.equal(publicationSlotAt("2026-10-23T08:05:00.000Z")?.key, "2026-10:day-23");
+  assert.equal(publicationSlotAt("2026-10-28T09:05:00.000Z")?.key, "2026-10:day-28");
+});
+
+test("all six November slots resolve exactly at 10:00 Amsterdam", () => {
+  for (const day of [3, 8, 13, 18, 23, 28]) {
+    const key = publicationSlotAt(`2026-11-${String(day).padStart(2, "0")}T09:05:00.000Z`)?.key;
+    assert.equal(key, `2026-11:day-${String(day).padStart(2, "0")}`);
+  }
 });
 
 test("missed, delayed and non-slot runs cannot catch up", () => {
-  for (const instant of ["2026-11-11T10:00:00.000Z", "2026-11-11T09:45:00.000Z", "2026-11-12T09:00:00.000Z"]) {
+  for (const instant of ["2026-11-03T10:00:00.000Z", "2026-11-03T09:45:00.000Z", "2026-11-04T09:00:00.000Z"]) {
     assert.equal(evaluatePublicationWindow({ instant, killSwitch: false }).allowed, false);
   }
 });
 
 test("kill switch, monthly quota and consumed slots fail closed", () => {
-  const instant = "2026-11-11T09:05:00.000Z";
+  const instant = "2026-11-03T09:05:00.000Z";
   assert.equal(evaluatePublicationWindow({ instant, killSwitch: true }).reason, "kill_switch_active");
-  const month = [{ monthKey: "2026-11", state: "published_verified" }, { monthKey: "2026-11", state: "uncertain" }];
+  const month = Array.from({ length: 6 }, (_, index) => ({ monthKey: "2026-11", state: index === 5 ? "uncertain" : "published_verified" }));
   assert.equal(evaluatePublicationWindow({ instant, killSwitch: false, monthlyRecords: month }).reason, "monthly_limit_reached");
-  assert.equal(evaluatePublicationWindow({ instant, killSwitch: false, slotRecords: [{ slotKey: "2026-11:second-wednesday", state: "publication_started" }] }).reason, "slot_already_consumed");
+  assert.equal(evaluatePublicationWindow({ instant, killSwitch: false, slotRecords: [{ slotKey: "2026-11:day-03", state: "publication_started" }] }).reason, "slot_already_consumed");
+});
+
+test("six consumed attempts allow no seventh attempt", () => {
+  const records = Array.from({ length: 6 }, (_, index) => ({ monthKey: "2026-11", state: index % 2 ? "uncertain" : "published_verified" }));
+  const result = evaluatePublicationWindow({ instant: "2026-11-28T09:05:00.000Z", killSwitch: false, monthlyRecords: records });
+  assert.equal(result.allowed, false); assert.equal(result.reason, "monthly_limit_reached"); assert.equal(result.monthCount, 6);
 });
 
 test("calendar-month quota resets without releasing uncertain prior-month attempts", () => {
   const old = [{ monthKey: "2026-10", state: "uncertain" }, { monthKey: "2026-10", state: "published_verified" }];
-  assert.equal(evaluatePublicationWindow({ instant: "2026-11-11T09:05:00.000Z", killSwitch: false, monthlyRecords: old }).allowed, true);
+  assert.equal(evaluatePublicationWindow({ instant: "2026-11-03T09:05:00.000Z", killSwitch: false, monthlyRecords: old }).allowed, true);
 });
 
 test("complete evidence is eligible but never directly authorizes publication", () => {
@@ -132,14 +147,14 @@ test("publication state keeps draft and publication eligibility separate", () =>
 test("publication reservation requires slot and attempt identity", () => {
   const base = { ...createPublicationRecord({ articleId: "a", contentFingerprint: fingerprint }), state: "wix_draft_verified" };
   assert.throws(() => transitionPublication(base, "publication_reserved", {}), /RESERVATION_REQUIRED/);
-  const reserved = transitionPublication(base, "publication_reserved", { slotKey: "2026-11:second-wednesday", publicationAttemptId: "attempt-1" });
+  const reserved = transitionPublication(base, "publication_reserved", { slotKey: "2026-11:day-03", publicationAttemptId: "attempt-1" });
   assert.equal(reserved.state, "publication_reserved");
 });
 
 test("publication plan remains non-executable and binds policy, slot and identity", () => {
   const c = candidate({ wixDraftId: "draft-1" });
   const decision = evaluateAutopilotEligibility(c, { now: new Date("2026-11-23T10:00:00Z"), killSwitch: false });
-  const plan = buildPublicationPlan({ candidate: c, decision, instant: "2026-11-11T09:05:00Z", killSwitch: false });
+  const plan = buildPublicationPlan({ candidate: c, decision, instant: "2026-11-03T09:05:00Z", killSwitch: false });
   assert.equal(plan.developmentReady, true); assert.equal(plan.executable, false); assert.equal(plan.reason, "production_activation_not_authorized");
   assert.equal(plan.siteId, publicationExecutorContract.siteId); assert.ok(plan.publicationAttemptId);
 });
@@ -159,14 +174,14 @@ test("Firestore publication reservation atomically consumes month and slot", asy
   };
   const ledger = new FirestorePublicationLedger({ projectId: "synthetic-project", accessToken: "synthetic-token", fetchImpl });
   const c = candidate({ wixDraftId: "draft-1" }); const decision = evaluateAutopilotEligibility(c, { now: new Date("2026-11-23T10:00:00Z"), killSwitch: false });
-  const plan = buildPublicationPlan({ candidate: c, decision, instant: "2026-11-11T09:05:00Z", killSwitch: false });
+  const plan = buildPublicationPlan({ candidate: c, decision, instant: "2026-11-03T09:05:00Z", killSwitch: false });
   const result = await reservePublicationSlot({ ledger, plan });
   assert.equal(result.reserved, true); assert.equal(result.count, 1); assert.equal(calls.filter((item) => item.url.includes("documents:commit")).length, 1); assert.equal(reads.size, 0);
 });
 
 test("concurrent Firestore reservation conflict cannot bypass quota or create another attempt", async () => {
   const ledger = new FirestorePublicationLedger({ projectId: "synthetic-project", accessToken: "synthetic-token", fetchImpl: async (_url, options = {}) => options.method === "POST" ? { ok: false, status: 409, async json() { return {}; } } : { ok: false, status: 404, async json() { return {}; } } });
-  const plan = { developmentReady: true, slot: { monthKey: "2026-11", key: "2026-11:second-wednesday" }, publicationAttemptId: "attempt", articleId: "article", contentFingerprint: fingerprint };
+  const plan = { developmentReady: true, slot: { monthKey: "2026-11", key: "2026-11:day-03" }, publicationAttemptId: "attempt", articleId: "article", contentFingerprint: fingerprint, wixDraftId: "draft" };
   const result = await reservePublicationSlot({ ledger, plan });
   assert.equal(result.reserved, false); assert.equal(result.reason, "concurrent_reservation_conflict");
 });

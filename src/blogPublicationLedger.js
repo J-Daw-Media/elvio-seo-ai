@@ -14,13 +14,13 @@ export class FirestorePublicationLedger {
     const document = await response.json();
     return { payload: JSON.parse(document.fields?.payloadJson?.stringValue || "null"), updateTime: document.updateTime };
   }
-  async reserveAtomically({ monthKey, slotKey, articleId, contentFingerprint, publicationAttemptId, limit = 2 } = {}) {
+  async reserveAtomically({ monthKey, slotKey, articleId, contentFingerprint, publicationAttemptId, wixDraftId = null, limit = 6 } = {}) {
     const monthId = `month-${monthKey}`; const slotId = `slot-${slotKey.replace(/[^a-z0-9-]/gi, "-")}`;
     const [month, slot] = await Promise.all([this.read(monthId), this.read(slotId)]);
     if (slot) return { reserved: false, reason: "slot_already_consumed", record: slot.payload };
     const count = Number(month?.payload?.consumedCount || 0);
     if (count >= limit) return { reserved: false, reason: "monthly_limit_reached", count };
-    const reservation = { id: stableId("blog-publication-reservation", { slotKey, articleId, contentFingerprint }), monthKey, slotKey, articleId, contentFingerprint, publicationAttemptId, state: "publication_reserved", createdAt: this.now() };
+    const reservation = { id: stableId("blog-publication-reservation", { slotKey, articleId, contentFingerprint }), monthKey, slotKey, articleId, contentFingerprint, publicationAttemptId, wixDraftId, state: "publication_reserved", createdAt: this.now(), verificationResult: null, publishedWixId: null, publicUrl: null, errorOrQuarantineReason: null };
     const monthPayload = { monthKey, consumedCount: count + 1, updatedAt: this.now() };
     const write = (id, payload, precondition) => ({ update: { name: this.documentName(id), fields: { payloadJson: { stringValue: JSON.stringify(payload) } } }, currentDocument: precondition });
     const writes = [
@@ -34,8 +34,8 @@ export class FirestorePublicationLedger {
   }
 }
 
-export async function reservePublicationSlot({ ledger, plan, monthlyLimit = 2 } = {}) {
+export async function reservePublicationSlot({ ledger, plan, monthlyLimit = 6 } = {}) {
   if (!plan?.developmentReady || !plan.slot || !plan.publicationAttemptId) throw new Error("PUBLICATION_PLAN_NOT_READY");
-  return ledger.reserveAtomically({ monthKey: plan.slot.monthKey, slotKey: plan.slot.key, articleId: plan.articleId, contentFingerprint: plan.contentFingerprint, publicationAttemptId: plan.publicationAttemptId, limit: monthlyLimit });
+  return ledger.reserveAtomically({ monthKey: plan.slot.monthKey, slotKey: plan.slot.key, articleId: plan.articleId, contentFingerprint: plan.contentFingerprint, publicationAttemptId: plan.publicationAttemptId, wixDraftId: plan.wixDraftId, limit: monthlyLimit });
 }
 

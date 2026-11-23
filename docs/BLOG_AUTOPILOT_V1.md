@@ -7,8 +7,8 @@ This package is development-only. It does not create schedules, Wix credentials,
 ## Operating policy
 
 - Future operating mode: full autopilot after staged production approval.
-- Hard monthly maximum: two verified publications in `Europe/Amsterdam`.
-- Proposed slots: second and fourth Wednesday, 10:00, with a 30-minute execution window.
+- Hard monthly maximum: six consumed publication attempts in `Europe/Amsterdam`.
+- Proposed slots: the 3rd, 8th, 13th, 18th, 23rd and 28th of each month at 10:00, with a 30-minute execution window.
 - Maximum one consumed attempt per slot.
 - `uncertain` and verification-failed attempts consume their slot and monthly quota until manually reconciled.
 - No catch-up publication after a missed slot.
@@ -31,6 +31,20 @@ Creative Studio remains the single asset registry. Only owned, licensed, or owne
 2. Separately approved one-shot unpublished draft.
 3. Separately approved single publication trial with public verification.
 4. Separately approved one-slot autonomous trial.
-5. Separately approved two-slot full autopilot.
+5. Separately approved six-slot full autopilot.
+
+## Content-distribution guidance
+
+The opportunity queue may aim for two wedding topics, one corporate-event topic, one birthday/private-celebration topic, one pricing or event-planning topic and one seasonal or emerging topic. This is planning guidance only. Evidence strength and commercial relevance always outrank category balance, and unused category capacity never creates filler content.
+
+## Estimated incremental monthly cost
+
+These are planning estimates, not actual billing. Existing Wix and Google Cloud fixed costs are excluded.
+
+- Low-cost scenario, limited revisions and extensive reuse of persisted evidence: approximately EUR 3-8.
+- Typical scenario, six researched drafts with normal validation and occasional revision: approximately EUR 8-25.
+- Higher-revision scenario, repeated research or editorial regeneration: approximately EUR 25-60.
+
+AI inference is expected to dominate. Six scheduler invocations, bounded Cloud Run execution, Firestore reservation documents, Secret Manager access, Wix API calls, logs and dashboard reads should remain small at this frequency. No paid SEO, image or additional database service is required.
 
 No stage authorizes the next stage implicitly.

@@ -1,4 +1,4 @@
-export function selectAutopilotTopics({ opportunities = [], publishedTopics = [], now = new Date(), maximum = 2 } = {}) {
+export function selectAutopilotTopics({ opportunities = [], publishedTopics = [], now = new Date(), maximum = 6 } = {}) {
   const published = new Set(publishedTopics.map(normalize));
   const rejected = [];
   const eligible = [];
@@ -18,7 +18,7 @@ export function selectAutopilotTopics({ opportunities = [], publishedTopics = []
     else eligible.push(item);
   }
   eligible.sort((a, b) => Number(b.opportunityScore || 0) - Number(a.opportunityScore || 0) || String(a.id).localeCompare(String(b.id)));
-  return { selected: eligible.slice(0, Math.max(0, Math.min(maximum, 2))), rejected, unfilledCapacity: Math.max(0, Math.min(maximum, 2) - eligible.length) };
+  return { selected: eligible.slice(0, Math.max(0, Math.min(maximum, 6))), rejected, unfilledCapacity: Math.max(0, Math.min(maximum, 6) - eligible.length) };
 }
 
 function normalize(value) { return String(value || "").toLowerCase().replace(/[^a-z0-9à-ÿ]+/gi, " ").trim(); }

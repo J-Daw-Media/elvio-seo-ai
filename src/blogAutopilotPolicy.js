@@ -3,10 +3,14 @@ export const blogAutopilotPolicyV1 = Object.freeze({
   mode: "full_autopilot",
   activationState: "development_only",
   timezone: "Europe/Amsterdam",
-  monthlyPublicationLimit: 2,
+  monthlyPublicationLimit: 6,
   slots: Object.freeze([
-    { id: "second-wednesday", weekday: 3, ordinal: 2, hour: 10, minute: 0 },
-    { id: "fourth-wednesday", weekday: 3, ordinal: 4, hour: 10, minute: 0 },
+    { id: "day-03", dayOfMonth: 3, hour: 10, minute: 0 },
+    { id: "day-08", dayOfMonth: 8, hour: 10, minute: 0 },
+    { id: "day-13", dayOfMonth: 13, hour: 10, minute: 0 },
+    { id: "day-18", dayOfMonth: 18, hour: 10, minute: 0 },
+    { id: "day-23", dayOfMonth: 23, hour: 10, minute: 0 },
+    { id: "day-28", dayOfMonth: 28, hour: 10, minute: 0 },
   ]),
   slotWindowMinutes: 30,
   maximumPerSlot: 1,
@@ -28,8 +32,7 @@ export function amsterdamParts(instant) {
 
 export function publicationSlotAt(instant, policy = blogAutopilotPolicyV1) {
   const local = amsterdamParts(instant);
-  const ordinal = Math.floor((local.day - 1) / 7) + 1;
-  const slot = policy.slots.find((item) => item.weekday === local.weekday && item.ordinal === ordinal && item.hour === local.hour && local.minute >= item.minute && local.minute < item.minute + policy.slotWindowMinutes);
+  const slot = policy.slots.find((item) => item.dayOfMonth === local.day && item.hour === local.hour && local.minute >= item.minute && local.minute < item.minute + policy.slotWindowMinutes);
   return slot ? { ...slot, key: `${local.year}-${String(local.month).padStart(2, "0")}:${slot.id}`, monthKey: `${local.year}-${String(local.month).padStart(2, "0")}`, local } : null;
 }
 
