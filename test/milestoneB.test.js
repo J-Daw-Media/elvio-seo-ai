@@ -100,6 +100,14 @@ test("Wix media uses only generated signed upload and verifies READY", async () 
   assert.equal(result.fileId, "file1"); assert.deepEqual(calls.map((x) => x[1]), ["POST", "PUT"]);
 });
 
+test("Wix media accepts the documented operationStatus response field", async () => {
+  const fetchImpl = async (url) => url.includes("generate-upload-url")
+    ? { ok: true, json: async () => ({ uploadUrl: "https://upload.example/signed" }) }
+    : { ok: true, json: async () => ({ file: { id: "file2", operationStatus: "READY", mediaType: "IMAGE", url: "https://static.wixstatic.com/media/file2.jpg" } }) };
+  const result = await uploadVerifiedImage({ fetchImpl, credential: "x", siteId: "s", bytes: Buffer.from("x"), fileName: "a.jpg", mimeType: "image/jpeg" });
+  assert.equal(result.fileId, "file2");
+});
+
 test("runtime is fail closed by default and blocks without approved image", () => {
   assert.deepEqual(productionActivationState({}), { mode: "disabled", killSwitch: true, wixCredentialAvailable: false, publicationEnabled: false });
   const prepared = prepareAutopilotCandidate({ candidate: { id: "c" }, assets: [] });
