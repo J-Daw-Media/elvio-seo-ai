@@ -1,8 +1,8 @@
 import { generateArticle } from "./autopilotGeneration.js";
 
 export const vertexGenerationDefaults = Object.freeze({
-  location: "global", model: "gemini-2.5-flash", maxAttempts: 2, maxOutputTokens: 5000,
-  temperature: 0.35, inputUsdPerMillionTokens: 0.30, outputUsdPerMillionTokens: 2.50,
+  location: "global", model: "gemini-3.8-flash", maxAttempts: 2, maxOutputTokens: 5000,
+  temperature: 0.35, inputUsdPerMillionTokens: 0.75, outputUsdPerMillionTokens: 3.75,
 });
 
 const responseSchema = {
