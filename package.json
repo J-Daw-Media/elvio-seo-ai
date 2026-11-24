@@ -13,6 +13,7 @@
     "milestone-b:creative-rehearsal": "node scripts/milestone-b-creative-rehearsal.js",
     "milestone-b:first-publication-package": "node scripts/first-publication-package.js",
     "milestone-b:first-publication-trial": "node scripts/first-publication-trial.js",
-    "milestone-b:first-publication-recovery": "node scripts/first-publication-recovery.js"
+    "milestone-b:first-publication-recovery": "node scripts/first-publication-recovery.js",
+    "publisher:run": "node scripts/run-production-publisher.js"
   }
 }

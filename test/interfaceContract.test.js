@@ -61,7 +61,7 @@ test("read model uses only the approved bounded collections", async () => {
   const reader = { list: async (collection, options) => { calls.push([collection, options]); return []; } };
   const result = await new SeoInterfaceReadModel({ reader, maxRecords: 999 }).read({ now: "2026-11-23T09:00:00Z" });
   assert.equal(result.readOnly, true);
-  assert.equal(calls.length, 9);
+  assert.equal(calls.length, 13);
   assert.ok(calls.every(([, options]) => options.limit === 100));
 });
 

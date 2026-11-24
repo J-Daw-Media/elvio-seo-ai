@@ -10,6 +10,10 @@ export const seoInterfaceCollections = Object.freeze({
   attributionConflicts: "attribution_conflicts_v1",
   attributionExecutions: "attribution_executions_v1",
   collectionExecutions: "executions",
+  publisherCandidateEvents: "publisher_candidate_events_v1",
+  publisherExecutions: "publisher_executions_v1",
+  publisherAttempts: "publisher_attempts_v1",
+  publisherIncidents: "publisher_incidents_v1",
 });
 
 const asArray = (value) => Array.isArray(value) ? value : [];
@@ -207,6 +211,8 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
       monthlyTargetMaximum: Math.min(6, Math.max(0, number(autopilot.monthlyTargetMaximum || 6))),
       publishedThisMonth: Math.max(0, number(autopilot.publishedThisMonth)),
       remainingMonthlyCapacity: Math.max(0, 6 - Math.max(0, number(autopilot.publishedThisMonth)) - Math.max(0, number(autopilot.consumedUnverifiedAttempts))),
+      exploratoryAttemptsThisMonth: Math.max(0, number(autopilot.exploratoryAttemptsThisMonth)),
+      remainingExploratoryCapacity: Math.max(0, 2 - Math.max(0, number(autopilot.exploratoryAttemptsThisMonth))),
       upcomingSlots: asArray(autopilot.upcomingSlots).slice(0, 6).map((item) => ({ id: text(item.id), localTime: iso(item.localTime), state: text(item.state || "planned"), articleId: text(item.articleId), attemptId: text(item.attemptId), quarantineReason: text(item.quarantineReason) })),
       nextUpcomingSlot: (() => { const item = asArray(autopilot.upcomingSlots).find((slot) => ["planned", "unused"].includes(slot.state)); return item ? { id: text(item.id), localTime: iso(item.localTime), state: text(item.state) } : null; })(),
       candidateQueue: page(autopilotQueue, { limit: 25, max: 50 }),
@@ -219,6 +225,9 @@ export function buildSeoInterfaceContract(input = {}, options = {}) {
       latestExecutionStatus: text(autopilot.latestExecutionStatus || "not_activated"),
       latestVerifiedPublication: [...publicationHistory].filter((item) => item.state === "published_verified").sort((a, b) => String(b.completedAt || "").localeCompare(String(a.completedAt || "")))[0] || null,
       killSwitchActive: autopilot.killSwitchActive !== false,
+      credentialHealth: text(autopilot.credentialHealth || "unknown"),
+      generationCostUsd: Math.max(0, number(autopilot.generationCostUsd)),
+      incidents: page(asArray(autopilot.incidents).map((item) => ({ id: text(item.id), state: text(item.state || "open"), code: text(item.code || item.incidentCode), createdAt: iso(item.createdAt || item.at) })), { limit: 25, max: 50 }),
       performance: { searchEvidenceAvailable: autopilot.performance?.searchEvidenceAvailable === true, organicAttributionAvailable: autopilot.performance?.organicAttributionAvailable === true, limitation: text(autopilot.performance?.limitation || "Publication and commercial attribution remain unavailable until separately activated and verified.") },
       readOnly: true,
     },
