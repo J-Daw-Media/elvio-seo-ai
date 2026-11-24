@@ -17,7 +17,7 @@ async function parent() {
   return ledger;
 }
 function response(body) { return { ok: true, status: 200, async json() { return structuredClone(body); }, async arrayBuffer() { return bytes; } }; }
-function fetcher(calls) { return async (url, options) => { calls.push([url, options.method]); if (url.endsWith("/files/search")) return response({ files: [{ id: "img-1", displayName: packageData.image.fileName, operationStatus: "READY", mediaType: "IMAGE", url: "https://static.wixstatic.com/media/img-1.jpg" }] }); if (url.includes("static.wixstatic.com")) return response({}); if (url.endsWith("/query")) return response({ draftPosts: [{ id: packageData.wix.existingHistoricalDraftId, title: packageData.article.title, seoSlug: packageData.article.slug, status: "UNPUBLISHED" }] }); if (options.method === "PATCH") return response({ draftPost: { id: packageData.wix.existingHistoricalDraftId } }); if (options.method === "GET") return response({ draftPost: { id: packageData.wix.existingHistoricalDraftId } }); if (url.endsWith("/publish")) return response({ postId: "post-1" }); throw new Error(url); }; }
+function fetcher(calls) { return async (url, options) => { calls.push([url, options.method, options.body]); if (url.endsWith("/files/search")) return response({ files: [{ id: "img-1", displayName: packageData.image.fileName, operationStatus: "READY", mediaType: "IMAGE", url: "https://static.wixstatic.com/media/img-1.jpg" }] }); if (url.includes("static.wixstatic.com")) return response({}); if (url.endsWith("/query")) return response({ draftPosts: [{ id: packageData.wix.existingHistoricalDraftId, title: packageData.article.title, seoSlug: packageData.article.slug, status: "UNPUBLISHED" }] }); if (options.method === "PATCH") return response({ draftPost: { id: packageData.wix.existingHistoricalDraftId } }); if (options.method === "GET") return response({ draftPost: { id: packageData.wix.existingHistoricalDraftId } }); if (url.endsWith("/publish")) return response({ postId: "post-1" }); throw new Error(url); }; }
 
 test("recovery reuses the exact uploaded image, updates the existing draft and publishes once", async () => {
   const calls = []; const recoveryLedger = new InMemoryFirstPublicationLedger();
@@ -26,6 +26,13 @@ test("recovery reuses the exact uploaded image, updates the existing draft and p
   assert.equal(calls.filter(([url]) => url.endsWith("/files/search")).length, 1);
   assert.equal(calls.some(([url]) => url.includes("generate-upload-url")), false);
   assert.equal(calls.filter(([, method]) => method === "PATCH").length, 1);
+  const patchBody = JSON.parse(calls.find(([, method]) => method === "PATCH")[2]);
+  assert.deepEqual(patchBody.draftPost.media, {
+    wixMedia: { image: { id: "img-1", url: "https://static.wixstatic.com/media/img-1.jpg" } },
+    displayed: true,
+    custom: true,
+    altText: packageData.image.altText,
+  });
   assert.equal(calls.filter(([url]) => url.endsWith("/publish")).length, 1);
   const replay = await recoverFirstPublication({ packageData, authorization, originalLedger: await parent(), recoveryLedger, credential: "restricted", fetchImpl: fetcher(calls), verifyDraft: async () => ({ verified: true }), verifyPublic: async () => ({ verified: true, url: packageData.article.expectedPublicUrl }) });
   assert.equal(replay.replayBlocked, true);

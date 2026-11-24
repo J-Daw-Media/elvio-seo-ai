@@ -25,7 +25,7 @@ const packageData = buildFirstPublicationPackage();
 const authorization = buildFirstPublicationAuthorization({ authorizationId: process.env.FIRST_PUBLICATION_RECOVERY_AUTHORIZATION_ID, attemptId: process.env.FIRST_PUBLICATION_RECOVERY_ATTEMPT_ID, approvedAt: process.env.FIRST_PUBLICATION_RECOVERY_APPROVED_AT });
 const client = new FirestoreRestTransactionClient({ projectId: process.env.GCP_PROJECT, accessToken: googleToken });
 const originalLedger = new FirestoreFirstPublicationLedger({ client });
-const recoveryLedger = new FirestoreFirstPublicationLedger({ client, collection: "seo_wix_first_publication_recoveries" });
+const recoveryLedger = new FirestoreFirstPublicationLedger({ client, collection: "seo_wix_first_publication_recoveries", id: authorization.attemptId });
 const verifyDraft = async (draft, context) => {
   if (context.stage === "pre_update") { const status = String(draft?.status || "").toUpperCase(); return { verified: draft?.id === context.expectedId && ["DRAFT", "UNPUBLISHED"].includes(status) }; }
   return { verified: true, ...verifyRetrievedDraft(draft, context.expectedPayload, context.expectedId, packageData.wix.siteId) };
