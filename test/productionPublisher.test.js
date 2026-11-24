@@ -50,6 +50,13 @@ test("readiness uses the real generation path and persists an eligible non-publi
   assert.ok(events.some((event) => event.state === "eligible_for_publication"));
 });
 
+test("separate readiness runs retain separate durable execution identities", async () => {
+  const base = { evidence: [], existingContent: [], assets: [], sourceFingerprint: "same-source", mode: "readiness", killSwitch: true };
+  const first = await runPublisherPipeline({ ...base, now: new Date("2026-11-24T06:57:00.000Z") });
+  const second = await runPublisherPipeline({ ...base, now: new Date("2026-11-24T06:58:00.000Z") });
+  assert.notEqual(first.executionId, second.executionId);
+});
+
 test("kill switch prevents transport even after successful generation", async () => {
   let publishCalls = 0;
   const result = await runPublisherPipeline({ evidence, existingContent: [], assets: loadBundledCreativeStudioRegistry(), sourceFingerprint: "kill-source", mode: "full", killSwitch: true, now, generate: async (candidate) => ({ article: article(candidate.evidenceFactors[0].ref), validation: { passed: true, errors: [] } }), publish: async () => { publishCalls += 1; } });
