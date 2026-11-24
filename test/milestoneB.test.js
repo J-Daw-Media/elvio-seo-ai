@@ -127,6 +127,15 @@ test("public page verification checks canonical metadata CTA image and indexabil
   assert.equal(result.verified, true);
 });
 
+test("public verification ignores noindex text in scripts but honors robots directives", async () => {
+  const base = '<html><head><title>SEO</title><link rel="canonical" href="https://www.djelvio.nl/blog/x"></head><body><h1>H1</h1><a href="https://www.djelvio.nl/contact">Contact</a><img src="image1"><script>const option = "noindex";</script></body></html>';
+  const expected = { seoTitle: "SEO", canonicalUrl: "https://www.djelvio.nl/blog/x", h1: "H1", ctaUrl: "https://www.djelvio.nl/contact", imageIdentity: "image1" };
+  const response = (html, header = null) => ({ ok: true, url: expected.canonicalUrl, headers: { get: () => header }, text: async () => html });
+  assert.equal((await verifyPublicArticle({ url: expected.canonicalUrl, expected, fetchImpl: async () => response(base) })).checks.indexable, true);
+  assert.equal((await verifyPublicArticle({ url: expected.canonicalUrl, expected, fetchImpl: async () => response(base.replace("</head>", '<meta name="robots" content="noindex"></head>')) })).checks.indexable, false);
+  assert.equal((await verifyPublicArticle({ url: expected.canonicalUrl, expected, fetchImpl: async () => response(base, "noindex") })).checks.indexable, false);
+});
+
 test("Milestone B rehearsal covers all fifteen stages without external activity", () => {
   const result = runMilestoneBCreativeRehearsal();
   assert.equal(result.steps.length, 15);

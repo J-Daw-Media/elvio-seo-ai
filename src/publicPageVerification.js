@@ -4,13 +4,17 @@ export async function verifyPublicArticle({ url, expected, fetchImpl = fetch } =
   const response = await fetchImpl(url, { method: "GET", redirect: "follow" });
   if (!response.ok) throw new Error(`PUBLIC_ARTICLE_HTTP_${response.status}`);
   const html = await response.text();
+  const robotsDirectives = [
+    ...[...html.matchAll(/<meta\b[^>]*\bname=["'](?:robots|googlebot)["'][^>]*>/gi)].map(([tag]) => tag),
+    response.headers?.get?.("x-robots-tag") || "",
+  ].join(" ");
   const checks = {
     title: html.includes(`<title>${expected.seoTitle}</title>`),
     canonical: html.includes(`rel="canonical"`) && html.includes(expected.canonicalUrl),
     h1: html.includes(`<h1`) && html.includes(expected.h1),
     cta: html.includes(expected.ctaUrl),
     image: html.includes(expected.imageIdentity),
-    indexable: !/noindex/i.test(html),
+    indexable: !/\bnoindex\b/i.test(robotsDirectives),
   };
   return { verified: Object.values(checks).every(Boolean), checks, url: response.url || url };
 }
