@@ -24,7 +24,7 @@ export function buildWixDraftPayload(draft, image = null) {
     payload: { draftPost: {
       title: draft.title, seoSlug: draft.slug, memberId: wixPhase2Contract.memberId, excerpt: draft.metaDescription,
       richContent: htmlToWixRichContent(draft.bodyHtml),
-      seoData: { tags: [{ type: "title", children: draft.title }, { type: "meta", props: { name: "description", content: draft.metaDescription } }] },
+      seoData: { tags: [{ type: "title", children: draft.seoTitle || draft.title }, { type: "meta", props: { name: "description", content: draft.metaDescription } }] },
       media: image ? { wixMedia: { image: image.sourceUrl } } : undefined,
     }, fieldsets: ["RICH_CONTENT", "URL"], publish: false },
     mode: "dry_run_only", writesPerformed: 0, publishAllowed: false,

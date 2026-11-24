@@ -108,6 +108,26 @@ test("Wix media accepts the documented operationStatus response field", async ()
   assert.equal(result.fileId, "file2");
 });
 
+test("Wix media polls the documented descriptor until processing is READY", async () => {
+  const calls = [];
+  const fetchImpl = async (url, options = {}) => {
+    calls.push([url, options.method]);
+    if (url.includes("generate-upload-url")) return { ok: true, json: async () => ({ uploadUrl: "https://upload.example/signed" }) };
+    if (url.includes("get-file-by-id")) return { ok: true, json: async () => ({ file: { id: "file3", operationStatus: "READY", mimeType: "image/jpeg", url: "https://static.wixstatic.com/media/file3.jpg" } }) };
+    return { ok: true, json: async () => ({ file: { id: "file3", operationStatus: "PENDING", mimeType: "image/jpeg" } }) };
+  };
+  const result = await uploadVerifiedImage({ fetchImpl, credential: "x", siteId: "s", bytes: Buffer.from("x"), fileName: "a.jpg", mimeType: "image/jpeg", pollDelayMs: 0, sleep: async () => {} });
+  assert.equal(result.fileId, "file3");
+  assert.equal(calls.filter(([url]) => url.includes("get-file-by-id")).length, 1);
+});
+
+test("Wix media fails closed when processing never becomes READY", async () => {
+  const fetchImpl = async (url) => url.includes("generate-upload-url")
+    ? { ok: true, json: async () => ({ uploadUrl: "https://upload.example/signed" }) }
+    : { ok: true, json: async () => ({ file: { id: "file4", operationStatus: "PENDING", mimeType: "image/jpeg" } }) };
+  await assert.rejects(uploadVerifiedImage({ fetchImpl, credential: "x", siteId: "s", bytes: Buffer.from("x"), fileName: "a.jpg", mimeType: "image/jpeg", maxReadyChecks: 2, pollDelayMs: 0, sleep: async () => {} }), /WIX_MEDIA_READY_TIMEOUT/);
+});
+
 test("runtime is fail closed by default and blocks without approved image", () => {
   assert.deepEqual(productionActivationState({}), { mode: "disabled", killSwitch: true, wixCredentialAvailable: false, publicationEnabled: false });
   const prepared = prepareAutopilotCandidate({ candidate: { id: "c" }, assets: [] });
