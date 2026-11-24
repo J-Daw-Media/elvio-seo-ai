@@ -28,7 +28,11 @@ export async function runPublisherPipeline({
   publish = null, monthlyRecords = [], slotRecords = [], exploratoryAttemptsThisMonth = 0, runtimeHealth = {},
 } = {}) {
   if (!allowedModes.has(mode)) throw new Error("PUBLISHER_MODE_INVALID");
-  const executionId = stableId("seo-publisher-execution", { sourceFingerprint, mode, at: now.toISOString().slice(0, 13) });
+  // Readiness runs may be repeated while validating production. Keep each audit
+  // result durable, while scheduled publishing keeps an hour-stable identity so
+  // duplicate slot invocations reconcile to the same execution.
+  const executionIdentityTime = mode === "readiness" ? now.toISOString() : now.toISOString().slice(0, 13);
+  const executionId = stableId("seo-publisher-execution", { sourceFingerprint, mode, at: executionIdentityTime });
   const discovered = discoverOpportunities({ evidence, existingContent, sourceFingerprint, evaluatedAt: now.toISOString() });
   for (const candidate of discovered) await persistEvent({ executionId, candidateId: candidate.id, state: candidate.state, reason: candidate.reason, candidate, at: now.toISOString() });
   const selection = selectAutopilotTopics({ opportunities: discovered, publishedTopics: existingContent.map((item) => item.title), now, maximum: 6, exploratoryMaximum: 2 });
