@@ -98,8 +98,10 @@ function recoverableRuntimeIncident(code) {
   return /^(VERTEX_|PUBLISHER_(CREATIVE_STUDIO|SNAPSHOT|SECRET|READ))/i.test(String(code || ""));
 }
 
-function sanitizeIncidentCode(error) {
-  const value = String(error?.message || "PUBLISHER_UNKNOWN_FAILURE").toUpperCase();
+export function sanitizeIncidentCode(error) {
+  const message = String(error?.message || "PUBLISHER_UNKNOWN_FAILURE");
+  if (/abort|timeout/i.test(message)) return "VERTEX_GENERATION_TIMEOUT";
+  const value = message.toUpperCase();
   return /^[A-Z0-9_:-]{1,120}$/.test(value) ? value : "PUBLISHER_SANITIZED_FAILURE";
 }
 
