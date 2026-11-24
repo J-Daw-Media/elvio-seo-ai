@@ -1,0 +1,21 @@
+import { buildFirstPublicationPackage } from "../src/firstPublicationPackage.js";
+import { executeFirstPublicationSeoCorrection } from "../src/firstPublicationSeoCorrection.js";
+import { FirestoreFirstPublicationLedger } from "../src/firstPublicationTrial.js";
+import { FirestoreRestTransactionClient } from "../src/wixAttemptLedger.js";
+import { verifyPublicArticle } from "../src/publicPageVerification.js";
+
+if (process.env.FIRST_PUBLICATION_SEO_CORRECTION_ENABLED !== "true") throw new Error("SEO_CORRECTION_DISABLED");
+for (const name of ["GCP_PROJECT", "WIX_PERSISTENT_SECRET_ID", "FIRST_PUBLICATION_SEO_CORRECTION_ATTEMPT_ID"]) if (!process.env[name]) throw new Error(`SEO_CORRECTION_CONFIGURATION_MISSING_${name}`);
+const googleToken = process.env.GOOGLE_OAUTH_ACCESS_TOKEN;
+if (!googleToken) throw new Error("SEO_CORRECTION_GOOGLE_TOKEN_REQUIRED");
+const secretName = `projects/${process.env.GCP_PROJECT}/secrets/${process.env.WIX_PERSISTENT_SECRET_ID}/versions/latest`;
+const secretResponse = await fetch(`https://secretmanager.googleapis.com/v1/${secretName}:access`, { headers: { authorization: `Bearer ${googleToken}` } });
+if (!secretResponse.ok) throw new Error(`SEO_CORRECTION_SECRET_HTTP_${secretResponse.status}`);
+const credential = Buffer.from((await secretResponse.json()).payload.data, "base64").toString("utf8").trim();
+const packageData = buildFirstPublicationPackage();
+const image = { id: "c486ef_d3b89118f33846c9ab227cc49cae1be0~mv2.jpg", url: "https://static.wixstatic.com/media/c486ef_d3b89118f33846c9ab227cc49cae1be0~mv2.jpg" };
+const client = new FirestoreRestTransactionClient({ projectId: process.env.GCP_PROJECT, accessToken: googleToken });
+const ledger = new FirestoreFirstPublicationLedger({ client, collection: "seo_wix_first_publication_corrections", id: process.env.FIRST_PUBLICATION_SEO_CORRECTION_ATTEMPT_ID });
+const verifyPublic = async (expected) => verifyPublicArticle({ url: expected.canonicalUrl, expected });
+const result = await executeFirstPublicationSeoCorrection({ packageData, image, ledger, credential, verifyPublic });
+process.stdout.write(`${JSON.stringify(result)}\n`);
