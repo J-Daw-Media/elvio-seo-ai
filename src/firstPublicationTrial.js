@@ -35,9 +35,10 @@ export class InMemoryFirstPublicationLedger {
 }
 
 export class FirestoreFirstPublicationLedger {
-  constructor({ client, collection = "seo_wix_first_publication_trials", now = () => new Date().toISOString() } = {}) {
+  constructor({ client, collection = "seo_wix_first_publication_trials", id = PUBLISH_FINGERPRINT, now = () => new Date().toISOString() } = {}) {
     if (!client) throw new Error("FIRST_PUBLICATION_FIRESTORE_CLIENT_REQUIRED");
-    this.client = client; this.collection = collection; this.now = now; this.id = PUBLISH_FINGERPRINT;
+    if (!id) throw new Error("FIRST_PUBLICATION_FIRESTORE_ID_REQUIRED");
+    this.client = client; this.collection = collection; this.now = now; this.id = id;
   }
   path() { return this.client.path(this.collection, this.id); }
   async reserve(input) {

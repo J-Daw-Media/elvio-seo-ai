@@ -38,6 +38,12 @@ export async function recoverFirstPublication({ packageData, authorization, orig
 
     const payload = buildWixDraftPayload(packageData.article, { sourceUrl: exact[0].url });
     payload.payload.draftPost.id = DRAFT_ID;
+    payload.payload.draftPost.media = {
+      wixMedia: { image: { id: exact[0].id, url: exact[0].url } },
+      displayed: true,
+      custom: true,
+      altText: packageData.image.altText,
+    };
     record = await recoveryLedger.transition(record.version, "draft_update_started", { requestCounts: { ...record.requestCounts, draftUpdate: 1 } });
     const updated = await requestJson(fetchImpl, `https://www.wixapis.com/blog/v3/draft-posts/${DRAFT_ID}`, { method: "PATCH", headers, body: JSON.stringify({ draftPost: payload.payload.draftPost, action: "UPDATE", fieldsets: ["RICH_CONTENT", "URL"] }) }, timeoutMs);
     if (updated.draftPost?.id !== DRAFT_ID) throw new Error("FIRST_PUBLICATION_RECOVERY_UPDATE_UNCERTAIN");
