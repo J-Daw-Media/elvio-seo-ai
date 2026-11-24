@@ -18,7 +18,7 @@ export async function uploadVerifiedImage({ fetchImpl = fetch, credential, siteI
   if (!uploaded.ok) throw new Error(`WIX_MEDIA_UPLOAD_HTTP_${uploaded.status}`);
   const result = await uploaded.json();
   const file = result.file || result;
-  if (!file.id || String(file.state || file.status || "").toUpperCase() !== "READY" || !String(file.mimeType || mimeType).startsWith("image/")) throw new Error("WIX_MEDIA_VERIFICATION_FAILED");
+  if (!file.id || String(file.operationStatus || file.state || file.status || "").toUpperCase() !== "READY" || !String(file.mimeType || mimeType).startsWith("image/")) throw new Error("WIX_MEDIA_VERIFICATION_FAILED");
   return { fileId: file.id, mediaUrl: file.url || file.media?.image?.url || null, state: "READY" };
 }
 
