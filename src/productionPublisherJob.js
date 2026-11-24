@@ -59,6 +59,10 @@ export async function runProductionPublisher({ env = process.env, now = new Date
   const client = new FirestoreRestTransactionClient({ projectId, accessToken: token, fetchImpl });
   const store = new FirestorePublisherStore({ client });
   const ledger = new FirestoreAutopilotExecutionLedger({ client });
+  const incidentReader = new FirestoreInterfaceReader({ projectId, accessTokenProvider: async () => token, maxRecords: 100, fetchImpl });
+  const incidentHistory = await incidentReader.list("publisher_incidents_v1", { limit: 100 });
+  const unresolved = unresolvedIncidents(incidentHistory);
+  const effectiveKillSwitch = killSwitch || (mode !== "readiness" && unresolved.length > 0);
   const generate = (opportunity) => generateProductionArticle({ opportunity, approvedBusinessFacts, accessTokenProvider: async () => token, projectId, fetchImpl, model: env.BLOG_GENERATION_MODEL || "gemini-3.8-flash" });
   const publish = async ({ candidate, draft, image, ...context }) => {
     const objectName = `${String(env.CREATIVE_STUDIO_OBJECT_PREFIX || "elvio-seo-ai/creative-studio/approved-assets").replace(/\/$/, "")}/${image.fileName}`;
@@ -68,15 +72,30 @@ export async function runProductionPublisher({ env = process.env, now = new Date
   try {
     const result = await runPublisherPipeline({
       evidence: snapshot.evidence || [], existingContent, assets, sourceFingerprint: latest.snapshotChecksum,
-      mode, killSwitch, now, generate, publish,
-      runtimeHealth: { credentialHealth: "verified_runtime_access", creativeStudioHealth: "verified", sourceEvidenceHealth: "verified" },
+      mode, killSwitch: effectiveKillSwitch, now, generate, publish,
+      runtimeHealth: { credentialHealth: "verified_runtime_access", creativeStudioHealth: "verified", sourceEvidenceHealth: "verified", unresolvedCriticalIncidentCount: unresolved.length },
       persistEvent: (event) => store.persistEvent(event), persistExecution: (execution) => store.persistExecution(execution),
     });
-    return { ...result, sourceSnapshot: latest.snapshotObject, sourceChecksum: latest.snapshotChecksum, model: env.BLOG_GENERATION_MODEL || "gemini-3.8-flash", creativeAssetsVerified: creative.verifiedAssets, killSwitch, siteId: SITE_ID };
+    if (result.status === "completed_no_publication") {
+      for (const incident of unresolved.filter((item) => recoverableRuntimeIncident(item.code))) {
+        await store.persistIncident({ state: "resolved", code: incident.code, resolvesIncidentId: incident.id || null, createdAt: now.toISOString(), killSwitchRequired: false });
+      }
+    }
+    return { ...result, sourceSnapshot: latest.snapshotObject, sourceChecksum: latest.snapshotChecksum, model: env.BLOG_GENERATION_MODEL || "gemini-3.8-flash", creativeAssetsVerified: creative.verifiedAssets, configuredKillSwitch: killSwitch, killSwitch: effectiveKillSwitch, siteId: SITE_ID };
   } catch (error) {
     await store.persistIncident({ state: "open", code: sanitizeIncidentCode(error), createdAt: now.toISOString(), killSwitchRequired: true });
     throw error;
   }
+}
+
+function unresolvedIncidents(records = []) {
+  const latest = new Map();
+  for (const item of [...records].sort((a, b) => String(a.createdAt || "").localeCompare(String(b.createdAt || "")))) if (item.code) latest.set(item.code, item);
+  return [...latest.values()].filter((item) => item.state === "open" && item.killSwitchRequired === true);
+}
+
+function recoverableRuntimeIncident(code) {
+  return /^(VERTEX_|PUBLISHER_(CREATIVE_STUDIO|SNAPSHOT|SECRET|READ))/i.test(String(code || ""));
 }
 
 function sanitizeIncidentCode(error) {

@@ -69,11 +69,13 @@ test("missing approved imagery holds an otherwise valid candidate", async () => 
 
 test("Vertex adapter requests bounded structured output and records token cost", async () => {
   let request;
-  const client = createVertexGenerationClient({ projectId: "p", accessTokenProvider: async () => "token", fetchImpl: async (_url, options) => { request = JSON.parse(options.body); return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(article("e1")) }] } }], usageMetadata: { promptTokenCount: 1000, candidatesTokenCount: 2000 } }) }; } });
+  const generated = { ...article("e1"), h1: "Model drift" };
+  const client = createVertexGenerationClient({ projectId: "p", accessTokenProvider: async () => "token", fetchImpl: async (_url, options) => { request = JSON.parse(options.body); return { ok: true, json: async () => ({ candidates: [{ content: { parts: [{ text: JSON.stringify(generated) }] } }], usageMetadata: { promptTokenCount: 1000, candidatesTokenCount: 2000 } }) }; } });
   const response = await client({ opportunity: { topic: "t", searchIntent: "i", commercialObjective: "c", evidence: { id: "e1" }, approvedBusinessFacts: [] }, model: "gemini-2.5-flash", maxOutputTokens: 5000 });
   assert.equal(request.generationConfig.responseMimeType, "application/json");
   assert.equal(request.generationConfig.maxOutputTokens, 5000);
   assert.ok(response.usage.estimatedUsd > 0);
+  assert.equal(response.article.h1, response.article.title);
   assert.equal(estimateGenerationCost({ promptTokenCount: 1000, candidatesTokenCount: 2000 }), response.usage.estimatedUsd);
 });
 

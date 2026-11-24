@@ -37,6 +37,8 @@ function buildPublisherReadModel(sources, now) {
   const month = attempts.find((item) => item.monthKey === monthKey && item.id === `month-${monthKey}`) || { consumedCount: 0, exploratoryCount: 0 };
   const publicationHistory = attempts.filter((item) => item.articleId && !String(item.id || "").startsWith("slot-")).map((item) => ({ ...item, completedAt: item.updatedAt || item.createdAt, publicUrl: item.publicUrl || null }));
   const upcomingSlots = futureSlots(now, attempts);
+  const incidentLatest = new Map();
+  for (const incident of [...(sources.publisherIncidents || [])].sort((a, b) => String(a.createdAt || a.at || "").localeCompare(String(b.createdAt || b.at || "")))) if (incident.code || incident.incidentCode) incidentLatest.set(incident.code || incident.incidentCode, incident);
   return {
     policyId: "elvio-blog-autopilot-v1", mode: latestExecution?.mode || "readiness", activationState: latestExecution ? "production_readiness" : "not_activated",
     monthlyTargetMaximum: 6, publishedThisMonth: publicationHistory.filter((item) => item.monthKey === monthKey && item.state === "publicly_verified").length,
@@ -47,7 +49,7 @@ function buildPublisherReadModel(sources, now) {
     wixPublishingStatus: latestExecution?.mode === "full" ? "enabled" : "disabled", killSwitchActive: latestExecution?.killSwitch !== false,
     credentialHealth: latestExecution?.credentialHealth || "unknown",
     generationCostUsd: executions.reduce((sum, item) => sum + Number(item.generationUsage?.estimatedUsd || 0), 0),
-    incidents: (sources.publisherIncidents || []).slice(0, 25),
+    incidents: [...incidentLatest.values()].sort((a, b) => String(b.createdAt || b.at || "").localeCompare(String(a.createdAt || a.at || ""))).slice(0, 25),
     performance: { searchEvidenceAvailable: Boolean(sources.collectionExecutions?.length), organicAttributionAvailable: false, limitation: "Commercial attribution remains outside this milestone." },
   };
 }

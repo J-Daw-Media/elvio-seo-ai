@@ -41,8 +41,8 @@ export async function runPublisherPipeline({
   await persistEvent({ executionId, candidateId: candidate.id, state: "generation_started", at: now.toISOString() });
   const generation = await generate(candidate);
   if (!generation?.validation?.passed || !generation.article) {
-    await persistEvent({ executionId, candidateId: candidate.id, state: "validation_failed", reason: generation?.validation?.errors || ["generation_failed"], at: now.toISOString() });
-    const result = { executionId, status: "completed_no_publication", mode, killSwitch, ...runtimeHealth, reason: "generation_or_validation_failed", discoveredCount: discovered.length, eligibleCount: selection.selected.length, writesToWix: 0 };
+    await persistEvent({ executionId, candidateId: candidate.id, state: "validation_failed", reason: generation?.validation?.errors || ["generation_failed"], generationUsage: generation?.usage || null, at: now.toISOString() });
+    const result = { executionId, status: "completed_no_publication", mode, killSwitch, ...runtimeHealth, reason: "generation_or_validation_failed", discoveredCount: discovered.length, eligibleCount: selection.selected.length, generationUsage: generation?.usage || null, writesToWix: 0 };
     await persistExecution(result); return result;
   }
   const draft = prepareProductionDraft(generation.article, candidate, existingContent);
