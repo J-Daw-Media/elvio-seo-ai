@@ -24,7 +24,7 @@ Firestore IAM does not provide collection-level permissions. The publisher there
 ```text
 BLOG_AUTOPILOT_MODE=readiness
 BLOG_AUTOPILOT_KILL_SWITCH=true
-BLOG_GENERATION_MODEL=gemini-2.5-flash
+BLOG_GENERATION_MODEL=gemini-3.8-flash
 WIX_PUBLISHER_SECRET=elvio-seo-wix-publisher
 ```
 

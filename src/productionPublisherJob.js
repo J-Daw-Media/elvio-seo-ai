@@ -59,7 +59,7 @@ export async function runProductionPublisher({ env = process.env, now = new Date
   const client = new FirestoreRestTransactionClient({ projectId, accessToken: token, fetchImpl });
   const store = new FirestorePublisherStore({ client });
   const ledger = new FirestoreAutopilotExecutionLedger({ client });
-  const generate = (opportunity) => generateProductionArticle({ opportunity, approvedBusinessFacts, accessTokenProvider: async () => token, projectId, fetchImpl, model: env.BLOG_GENERATION_MODEL || "gemini-2.5-flash" });
+  const generate = (opportunity) => generateProductionArticle({ opportunity, approvedBusinessFacts, accessTokenProvider: async () => token, projectId, fetchImpl, model: env.BLOG_GENERATION_MODEL || "gemini-3.8-flash" });
   const publish = async ({ candidate, draft, image, ...context }) => {
     const objectName = `${String(env.CREATIVE_STUDIO_OBJECT_PREFIX || "elvio-seo-ai/creative-studio/approved-assets").replace(/\/$/, "")}/${image.fileName}`;
     const imageBytes = await storageObjectBytes({ bucket, objectName, token });
@@ -72,7 +72,7 @@ export async function runProductionPublisher({ env = process.env, now = new Date
       runtimeHealth: { credentialHealth: "verified_runtime_access", creativeStudioHealth: "verified", sourceEvidenceHealth: "verified" },
       persistEvent: (event) => store.persistEvent(event), persistExecution: (execution) => store.persistExecution(execution),
     });
-    return { ...result, sourceSnapshot: latest.snapshotObject, sourceChecksum: latest.snapshotChecksum, model: env.BLOG_GENERATION_MODEL || "gemini-2.5-flash", creativeAssetsVerified: creative.verifiedAssets, killSwitch, siteId: SITE_ID };
+    return { ...result, sourceSnapshot: latest.snapshotObject, sourceChecksum: latest.snapshotChecksum, model: env.BLOG_GENERATION_MODEL || "gemini-3.8-flash", creativeAssetsVerified: creative.verifiedAssets, killSwitch, siteId: SITE_ID };
   } catch (error) {
     await store.persistIncident({ state: "open", code: sanitizeIncidentCode(error), createdAt: now.toISOString(), killSwitchRequired: true });
     throw error;
