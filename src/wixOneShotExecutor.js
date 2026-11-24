@@ -113,9 +113,15 @@ export function normalizeWixDraft(draft = {}) {
   return {
     id: draft.id ?? null, siteId: draft.siteId ?? null, memberId: draft.memberId ?? null, title: draft.title ?? null, seoSlug, excerpt: draft.excerpt ?? null,
     seoTitle, seoDescription, nodes, headings, paragraphs, links,
-    contentChecksum: sha256(canonicalContent), imageIdentity: draft.media?.wixMedia?.image || null,
+    contentChecksum: sha256(canonicalContent), imageIdentity: normalizeImageIdentity(draft.media?.wixMedia?.image),
     status: draft.status ?? null, publishedDate: draft.publishedDate ?? null,
   };
+}
+
+function normalizeImageIdentity(image) {
+  if (!image) return null;
+  if (typeof image === "string") return image;
+  return image.id || image.url || null;
 }
 
 export function verifyRetrievedDraft(actual, expected, expectedId, expectedSiteId = approvedGate4Candidate.siteId) {

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { gate4DryRunExample } from "../src/gate4Examples.js";
 import { transitionContentState } from "../src/gate4Content.js";
-import { WixOneShotExecutor, approvedGate4Candidate } from "../src/wixOneShotExecutor.js";
+import { WixOneShotExecutor, approvedGate4Candidate, verifyRetrievedDraft } from "../src/wixOneShotExecutor.js";
 import { FirestoreWixExecutionLedger, sanitizeExecutionRecord } from "../src/wixExecutionLedger.js";
 import { SecretManagerWixCredentialSession } from "../src/wixCredentialSession.js";
 
@@ -177,6 +177,18 @@ test("live Wix response shape accepts UNPUBLISHED and an empty media shell", asy
   assert.equal(result.receipt.verification.unpublished, true);
   assert.equal(result.receipt.verification.imageIdentity, true);
   assert.equal(result.receipt.verification.seoSlug, true);
+});
+
+test("Wix image metadata expansion preserves the stable image identity", () => {
+  const expected = prepared().wixDryRun.payload.draftPost;
+  expected.media = { wixMedia: { image: { id: "img-1", url: "https://static.wixstatic.com/media/img-1.jpg" } } };
+  const actual = structuredClone(expected);
+  actual.id = "wix-draft-123";
+  actual.status = "UNPUBLISHED";
+  actual.media.wixMedia.image.height = 1769;
+  actual.media.wixMedia.image.width = 2650;
+  actual.media.wixMedia.image.filename = "approved.jpg";
+  assert.equal(verifyRetrievedDraft(actual, expected, "wix-draft-123").imageIdentity, true);
 });
 
 test("credential site mismatch fails before request and revocation failure is explicit", async () => {
