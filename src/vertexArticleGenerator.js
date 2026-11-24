@@ -2,7 +2,8 @@ import { generateArticle } from "./autopilotGeneration.js";
 
 export const vertexGenerationDefaults = Object.freeze({
   location: "global", model: "gemini-3.8-flash", maxAttempts: 2, maxOutputTokens: 5000,
-  temperature: 0.35, inputUsdPerMillionTokens: 0.75, outputUsdPerMillionTokens: 3.75,
+  temperature: 0.35, requestTimeoutMs: 180_000,
+  inputUsdPerMillionTokens: 0.75, outputUsdPerMillionTokens: 3.75,
 });
 
 const responseSchema = {
@@ -25,7 +26,7 @@ export function createVertexGenerationClient({ projectId, accessTokenProvider, f
     const token = await accessTokenProvider();
     const endpoint = `https://aiplatform.googleapis.com/v1/projects/${encodeURIComponent(projectId)}/locations/${defaults.location}/publishers/google/models/${encodeURIComponent(model)}:generateContent`;
     const response = await fetchImpl(endpoint, {
-      method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, signal: AbortSignal.timeout(60_000),
+      method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, signal: AbortSignal.timeout(defaults.requestTimeoutMs),
       body: JSON.stringify({ contents: [{ role: "user", parts: [{ text: promptFor(opportunity, opportunity.approvedBusinessFacts || []) }] }], generationConfig: { responseMimeType: "application/json", responseSchema, temperature: defaults.temperature, maxOutputTokens } }),
     });
     if (!response.ok) throw new Error(`VERTEX_GENERATION_HTTP_${response.status}`);
