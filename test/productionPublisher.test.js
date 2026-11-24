@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { discoverOpportunities } from "../src/opportunityDiscoveryV2.js";
 import { runPublisherPipeline } from "../src/publisherOrchestrator.js";
+import { sanitizeIncidentCode } from "../src/productionPublisherJob.js";
 import { loadBundledCreativeStudioRegistry } from "../src/creativeStudioProduction.js";
 import { createVertexGenerationClient, estimateGenerationCost } from "../src/vertexArticleGenerator.js";
 import { InMemoryAutopilotExecutionLedger } from "../src/autopilotExecutionLedger.js";
@@ -34,6 +35,10 @@ test("production entrypoint treats no eligible candidate as a successful zero-pu
   assert.equal(result.reason, "no_eligible_candidate");
   assert.equal(result.writesToWix, 0);
   assert.equal(executions.length, 1);
+});
+
+test("bounded generation timeouts produce a recoverable incident code", () => {
+  assert.equal(sanitizeIncidentCode(new Error("The operation was aborted due to timeout")), "VERTEX_GENERATION_TIMEOUT");
 });
 
 test("readiness uses the real generation path and persists an eligible non-publishing candidate", async () => {
