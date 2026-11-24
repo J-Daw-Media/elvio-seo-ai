@@ -33,7 +33,9 @@ export function createVertexGenerationClient({ projectId, accessTokenProvider, f
     const text = payload.candidates?.[0]?.content?.parts?.map((part) => part.text || "").join("");
     if (!text) throw new Error("VERTEX_GENERATION_EMPTY");
     const usage = payload.usageMetadata || {};
-    return { article: JSON.parse(text), usage: { inputTokens: Number(usage.promptTokenCount || 0), outputTokens: Number(usage.candidatesTokenCount || 0), estimatedUsd: estimateGenerationCost(usage, defaults) } };
+    const article = JSON.parse(text);
+    if (article.title) article.h1 = article.title;
+    return { article, usage: { inputTokens: Number(usage.promptTokenCount || 0), outputTokens: Number(usage.candidatesTokenCount || 0), estimatedUsd: estimateGenerationCost(usage, defaults) } };
   };
 }
 
