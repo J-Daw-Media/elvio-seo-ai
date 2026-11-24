@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { sha256 } from "./identity.js";
 import { buildWixDraftPayload } from "./wixDrafts.js";
 import { uploadVerifiedImage } from "./wixMedia.js";
@@ -64,7 +65,7 @@ export class FirestoreFirstPublicationLedger {
 
 export async function executeFirstPublicationTrial({
   packageData, authorization, ledger, credentialSession, imageBytes, fetchImpl = fetch,
-  verifyDraft, verifyPublic, killSwitch = true, timeoutMs = 15000, hashBytes = sha256,
+  verifyDraft, verifyPublic, killSwitch = true, timeoutMs = 15000, hashBytes = sha256Bytes,
 } = {}) {
   validatePreflight({ packageData, authorization, ledger, credentialSession, imageBytes, verifyDraft, verifyPublic, killSwitch, hashBytes });
   const reservation = await ledger.reserve({
@@ -123,6 +124,10 @@ export async function executeFirstPublicationTrial({
       if (!revoked) throw new Error("FIRST_PUBLICATION_CREDENTIAL_REVOCATION_UNVERIFIED");
     }
   }
+}
+
+function sha256Bytes(value) {
+  return createHash("sha256").update(value).digest("hex");
 }
 
 function validatePreflight({ packageData, authorization, ledger, credentialSession, imageBytes, verifyDraft, verifyPublic, killSwitch, hashBytes }) {

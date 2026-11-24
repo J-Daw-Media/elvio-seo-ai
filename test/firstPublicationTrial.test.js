@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { buildFirstPublicationPackage } from "../src/firstPublicationPackage.js";
 import { buildFirstPublicationAuthorization, executeFirstPublicationTrial, InMemoryFirstPublicationLedger, assertEndpoint } from "../src/firstPublicationTrial.js";
 
@@ -53,4 +54,22 @@ test("kill switch, changed image, changed fingerprint and wrong endpoints fail b
   await assert.rejects(() => executeFirstPublicationTrial({ ...base, ledger: new InMemoryFirstPublicationLedger(), imageBytes: Buffer.from("changed"), hashBytes: () => "wrong", killSwitch: false }), /IMAGE_CHECKSUM/);
   await assert.rejects(() => executeFirstPublicationTrial({ ...base, ledger: new InMemoryFirstPublicationLedger(), packageData: { ...packageData, publicationFingerprint: "0".repeat(64) }, killSwitch: false }), /PACKAGE_MISMATCH/);
   for (const [url, method] of [["https://www.wixapis.com/blog/v3/draft-posts", "POST"], ["https://www.wixapis.com/blog/v3/draft-posts/other", "PATCH"], ["https://evil.example/blog/v3/draft-posts/query", "POST"]]) assert.throws(() => assertEndpoint(url, method), /NOT_ALLOWED/);
+});
+
+test("default image guard hashes the exact raw bytes", async () => {
+  const bytes = Buffer.from("exact approved image bytes");
+  const exactPackage = structuredClone(packageData);
+  exactPackage.image.checksum = createHash("sha256").update(bytes).digest("hex");
+  const result = await executeFirstPublicationTrial({
+    packageData: exactPackage,
+    authorization,
+    ledger: new InMemoryFirstPublicationLedger(),
+    credentialSession: credentialSession(),
+    imageBytes: bytes,
+    fetchImpl: fetcher([]),
+    verifyDraft,
+    verifyPublic,
+    killSwitch: false,
+  });
+  assert.equal(result.status, "public_verified");
 });
